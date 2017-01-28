@@ -342,6 +342,12 @@ $pg{options}{periodicRandomizationPeriod} = 5;
 #$courseDirs{html_temp}  =  "/var/www/wwtmp/$courseName";
 #$courseURLs{html_temp}   = "/wwtmp/$courseName";
 
+#####################
+# Additional PG modules
+#####################
+
+push (@{${pg}{modules}}, [qw(TikZ_Image2)]);
+
 ################################################################################ 
 # Student Date Format
 ################################################################################

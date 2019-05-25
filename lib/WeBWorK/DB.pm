@@ -2326,7 +2326,7 @@ sub validateKeyfieldValue {
 	    unless $value =~ m/^[-a-zA-Z0-9_.,]*$/;
 	# } elsif ($versioned and $keyfield eq "user_id") { 
     } elsif ($keyfield eq "user_id" || $keyfield eq 'userID') { 
-	check_user_id($value); #  (valid characters are [-a-zA-Z0-9_.,]) see above.
+		check_user_id($value); #  (valid characters are [-a-zA-Z0-9_.,]) see above.
     } elsif ($keyfield eq "ip_mask") {
 	croak "invalid characters in '$keyfield' field: '$value' (valid characters are [-a-zA-Z0-9_.,])"
 	    unless $value =~ m/^[-a-fA-F0-9_.:\/]*$/;

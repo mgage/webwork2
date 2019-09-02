@@ -383,8 +383,9 @@ $showeditors{simplepgeditor}   = 0;
 # Additional PG modules
 #####################
 
-
-push (@{${pg}{modules}}, [qw(TikZ_Image2)]);
+## used for Tikz.  Perhaps we can avoid these. They give a lot of power
+## to pg code writers -- at least for .pm files, not for .pg files.
+##push (@{${pg}{modules}}, [qw(File::Spec)], [qw(File::Temp)], [qw(File::Path)], [qw(TikZ_Image2)] );
 
 ################################################################################ 
 # Student Date Format

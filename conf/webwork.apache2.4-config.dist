@@ -93,16 +93,16 @@ $ENV{PG_ROOT} = $pg_dir;
 #################################################################
 # report server setup when child process starts up -- for example when restarting the server
 #################################################################
-print "webwork.apache2-config:  WeBWorK server is starting\n";
-print "webwork.apache2-config:  WeBWorK root directory set to $webwork_dir in webwork2/conf/webwork.apache2-config\n";
-print "webwork.apache2-config:  The following locations and urls are set in webwork2/conf/site.conf\n";
-print "webwork.apache2-config:  PG root directory set to $pg_dir\n";
-print "webwork.apache2-config:  WeBWorK server userID is ", $ce->{server_userID}, "\n";
-print "webwork.apache2-config:  WeBWorK server groupID is ", $ce->{server_groupID}, "\n";
-print "webwork.apache2-config:  The webwork url on this site is ", $ce->{server_root_url},"$webwork_url\n";
-print "webwork.apache2-config:  The webwork smtp server address is ", $ce->{mail}{smtpServer},"\n";
-print "webwork.apache2-config:     The webwork smtp server port is $ce->{mail}->{smtpPort}\n";
-print "webwork.apache2-config:     The webwork smtp server protocol is ", ($ce->{mail}->{tls_allow})?"'ssl'":"'not ssl'","\n";
+print "webwork.apache2.4-config:  WeBWorK server is starting\n";
+print "webwork.apache2.4-config:  WeBWorK root directory set to $webwork_dir in webwork2/conf/webwork.apache2-config\n";
+print "webwork.apache2.4-config:  The following locations and urls are set in webwork2/conf/site.conf\n";
+print "webwork.apache2.4-config:  PG root directory set to $pg_dir\n";
+print "webwork.apache2.4-config:  WeBWorK server userID is ", $ce->{server_userID}, "\n";
+print "webwork.apache2.4-config:  WeBWorK server groupID is ", $ce->{server_groupID}, "\n";
+print "webwork.apache2.4-config:  The webwork url on this site is ", $ce->{server_root_url},"$webwork_url\n";
+print "webwork.apache2.4-config:  The webwork smtp server address is ", $ce->{mail}{smtpServer},"\n";
+print "webwork.apache2.4-config:     The webwork smtp server port is $ce->{mail}->{smtpPort}\n";
+print "webwork.apache2.4-config:     The webwork smtp server protocol is ", ($ce->{mail}->{tls_allow})?"'ssl'":"'not ssl'","\n";
 
 # check compatibility of sendmail protocols and ports
 if (exists(($ce->{mail}->{smtpPort})) )  { # port not chosen automatically
@@ -126,6 +126,8 @@ require Apache::WeBWorK; # force compilation of pretty much everything
 print "Check in with MAA site\n";
 system("ping -c1 -s100 webwork.maa.org "); # check MAA site
 print "End connectivity check\n";
+print "WeBWorK website is ready.\n";
+
 # this snippet checks the connectivity with the internet.
 
 # it also alerts MAA that a webwork site is starting up.

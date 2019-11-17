@@ -55,10 +55,10 @@ ENV PG_BRANCH_ENV ${PG_BRANCH}
 
 WORKDIR /opt/base
 
-RUN echo Cloning branch $WEBWORK2_BRANCH_ENV from $WEBWORK2_GIT_URL_ENV \
-  && echo git clone --single-branch --branch ${WEBWORK2_BRANCH_ENV} --depth 1 $WEBWORK2_GIT_URL_ENV \
-  && git clone --single-branch --branch ${WEBWORK2_BRANCH_ENV} --depth 1 $WEBWORK2_GIT_URL_ENV \
-  && rm -rf webwork2/.git webwork2/{*ignore,Dockerfile,docker-compose.yml,docker-config}
+#RUN echo Cloning branch $WEBWORK2_BRANCH_ENV from $WEBWORK2_GIT_URL_ENV \
+#  && echo git clone --single-branch --branch ${WEBWORK2_BRANCH_ENV} --depth 1 $WEBWORK2_GIT_URL_ENV \
+#  && git clone --single-branch --branch ${WEBWORK2_BRANCH_ENV} --depth 1 $WEBWORK2_GIT_URL_ENV \
+#  && rm -rf webwork2/.git webwork2/{*ignore,Dockerfile,docker-compose.yml,docker-config}
 
 RUN echo Cloning branch $PG_BRANCH_ENV branch from $PG_GIT_URL_ENV \
   && echo git clone --single-branch --branch ${PG_BRANCH_ENV} --depth 1 $PG_GIT_URL_ENV \
@@ -215,6 +215,8 @@ RUN apt-get update \
 	lmodern \
 	zip \
 	jq \
+	vim \
+	iputils-ping \
     && apt-get clean \
     && rm -fr /var/lib/apt/lists/* /tmp/*
 
@@ -228,7 +230,7 @@ RUN apt-get update \
 
 RUN mkdir -p $APP_ROOT/courses $APP_ROOT/libraries $APP_ROOT/libraries/webwork-open-problem-library $APP_ROOT/webwork2 /www/www/html
 
-COPY --from=base /opt/base/webwork2 $APP_ROOT/webwork2
+COPY  . $APP_ROOT/webwork2
 COPY --from=base /opt/base/pg $APP_ROOT/pg
 COPY --from=base /opt/base/MathJax $APP_ROOT/MathJax
 

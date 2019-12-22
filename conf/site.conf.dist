@@ -135,6 +135,7 @@ $externalPrograms{pngtopnm} = "$netpbm_prefix/pngtopnm";
 # set timeout time (-t 40 sec) to be less than timeout for problem (usually 60 seconds)
 $externalPrograms{checkurl}     = "/usr/bin/lwp-request -d -t 40 -mHEAD "; # or "/usr/local/bin/w3c -head "
 $externalPrograms{curl}  = "/usr/bin/curl";
+$externalPrograms{curlCommand}  = "/usr/bin/curl"; # "curlCommand" is currently referenced in PG.pm, PGcore.pm and IO.pm instead of "curl".
 
 ####################################################
 # image conversions utiltiies

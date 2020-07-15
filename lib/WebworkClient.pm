@@ -205,8 +205,6 @@ our $result;
 ##################################################
 
 =head2 xmlrpcCall
-
-
 	
     $xmlrpc_client->encodeSource($source);
     $xmlrpc_client->{sourceFilePath}  = $fileName;
@@ -359,6 +357,8 @@ sub xmlrpcCall {
 
 =head2 jsXmlrpcCall
 
+	 A verision of xmlrpcCall meant to use JSON instead of xml. It was used somewhat in 
+	 setmaker2 (librarybrowser2) but I'm not sure it was ever completely finished. 
 =cut
 
 sub jsXmlrpcCall {
@@ -543,9 +543,14 @@ sub form_data {
 	$self->{inputs_ref};
 }
 
-=head2 initiate default values
-
+=head2 code for listing library
+	No longer in use.
+	
 =cut
+
+=item setInputTable_for_listLib() 
+	sets inputs for the call to the WebworkWebservice/LibraryActions.pm list function
+= cut
 sub setInputTable_for_listLib {
 	my $self = shift;
 	my $out = {
@@ -556,6 +561,14 @@ sub setInputTable_for_listLib {
 
 	$out;
 }
+
+=head2 default_inputs
+
+	construct default values for renderering the problem.
+	Used in xmlrpcCall(). 
+	Similar to code used in Local.pm
+
+=cut
 
 sub default_inputs {
 	my $self = shift;
@@ -601,6 +614,11 @@ sub default_inputs {
 
 =item environment
 
+	outputs a default environment for a problem about to be rendered anonymously.  
+	Similar to a function 
+	in PG.pm, but included here originally at least, so that PG.pm was not required.
+	Used in xmlrpcCall()
+	
 =cut
 
 sub environment {
@@ -675,7 +693,8 @@ sub environment {
 };
 
 =item formatRenderedLibraries
-
+	As far as I can tell this is no longer used anywhere.  It was originally
+	supposed to format the return of the listLibraries routine. 
 =cut
 	
 sub formatRenderedLibraries {
@@ -691,7 +710,9 @@ sub formatRenderedLibraries {
 }
 
 =item formatRenderedProblem
-
+	This subroutine has been split off and placed in formatRenderedProblem.pm where it can 
+	be called both from WebworkClient and from standalonePGproblemEditor.pm
+	
 =cut
 
 sub formatRenderedProblem {
@@ -729,8 +750,8 @@ sub writeRenderLogEntry($$$) {
 	WeBWorK::Utils::writeLog($seed_ce, "render_timing", "$$ ".time." $beginEnd $function [$details]");
 }
 
-=item pretty_print_self
-
+=item pretty_print
+	Provides HTML representation of a hash. Not a method. 
 =cut
 
 
@@ -781,6 +802,12 @@ sub pretty_print {    # provides html output -- NOT a method
 	
 	return $out." ";
 }
+
+=item format_hash_ref
+
+	A minimal representation of hash as a space separated list, key value key value...
+	Takes a hash reference. 
+=cut
 
 sub format_hash_ref {
 	my $hash = shift;

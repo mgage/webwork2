@@ -97,6 +97,7 @@ print "webwork.apache2-config:  PG root directory set to $pg_dir\n";
 print "webwork.apache2-config:  WeBWorK server userID is ", $ce->{server_userID}, "\n";
 print "webwork.apache2-config:  WeBWorK server groupID is ", $ce->{server_groupID}, "\n";
 print "webwork.apache2-config:  The webwork url on this site is ", $ce->{server_root_url},"$webwork_url\n";
+print "webwork.apache2-config:  The webwork documents url is $webwork_htdocs_url pointing to the directory $webwork_htdocs_dir\n";
 print "webwork.apache2-config:  The webwork smtp server address is ", $ce->{mail}{smtpServer},"\n";
 print "webwork.apache2-config:     The webwork smtp server port is $ce->{mail}->{smtpPort}\n";
 print "webwork.apache2-config:     The webwork smtp server protocol is ", ($ce->{mail}->{tls_allow})?"'ssl'":"'not ssl'","\n";
@@ -191,29 +192,31 @@ if ($webwork_url eq "") {
 ####################################################################
 # WebworkSOAP handlers (for integration with moodle)
 ####################################################################
- PerlModule WebworkSOAP
+ # Caution -- security risk
+ # needed only for wwassignment and OpaqueServer moodle connections
+ #
+ 
+ #PerlModule WebworkSOAP
 
  # WEBWORK SOAP CONFIGURATION
- <Location /webwork2_rpc>
-         PerlHandler Apache::SOAP
-         SetHandler perl-script
-         PerlSetVar dispatch_to "WebworkSOAP"
-         PerlSetVar options "compress_threshold => 10000"
-         Order Allow,Deny
-         Allow from All
- </Location>
+ #<Location /webwork2_rpc>
+ #        PerlHandler Apache::SOAP
+ #        SetHandler perl-script
+ #        PerlSetVar dispatch_to "WebworkSOAP"
+ #        PerlSetVar options "compress_threshold => 10000"
+ #        Require all granted
+ #</Location>
 
 ####################################################################
 # WebworkSOAP WSDL HANDLER :: TO BE REPLACED WITH A FILE FOR PRODUCTION SERVERS
 ####################################################################
- <Location /webwork2_wsdl>
-         PerlSetVar dispatch_to "WebworkSOAP::WSDL"
-         PerlSetVar options "compress_threshold => 10000"
-         PerlHandler WebworkSOAP::WSDL
-         SetHandler perl-script
-         Order Allow,Deny
-         Allow from All
- </Location>
+# <Location /webwork2_wsdl>
+#         PerlSetVar dispatch_to "WebworkSOAP::WSDL"
+#         PerlSetVar options "compress_threshold => 10000"
+#         PerlHandler WebworkSOAP::WSDL
+#         SetHandler perl-script
+#         Require all granted
+# </Location>
 
 
 ####################################################################

@@ -34,6 +34,13 @@ use constant {
 our %SeedCE;
 %WebworkSOAP::SeedCE = %WeBWorK::SeedCE;
 
+
+#caution security risk
+# make sure that you reset this soap_authen_key 
+# in this file and also in the moodle files
+# wwassignment and in OpaqueServer.
+# if you enable wwassignment and OpaqueServer.
+
 $WebworkSOAP::SeedCE{soap_authen_key} = "123456789123456789";
 #$WebworkSOAP::SeedCE{webwork_dir} = $ENV{WEBWORK_ROOT}|| warn "\$ENV{WEBWORK_ROOT} is undefined -- check your httpd configuration. Error caught ";
 

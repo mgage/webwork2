@@ -1,4 +1,4 @@
-$sticky_format = <<'ENDPROBLEMTEMPLATE';
+$libretexts_format = <<'ENDPROBLEMTEMPLATE';
 
 <!DOCTYPE html>
 <html $COURSE_LANG_AND_DIR>
@@ -12,9 +12,10 @@ $sticky_format = <<'ENDPROBLEMTEMPLATE';
 <link rel="stylesheet" type="text/css" href="/webwork2_files/js/vendor/bootstrap/css/bootstrap-responsive.css"/>
 <link rel="stylesheet" type="text/css" href="/webwork2_files/css/jquery-ui-1.8.18.custom.css"/>
 <link rel="stylesheet" type="text/css" href="/webwork2_files/css/vendor/font-awesome/css/font-awesome.min.css"/>
-<link rel="stylesheet" type="text/css" href="/webwork2_files/themes/math4/math4.css"/>
 <link rel="stylesheet" type="text/css" href="/webwork2_files/css/knowlstyle.css"/>
-
+# contains overrides
+<link rel="stylesheet" type="text/css" href="/webwork2_files/themes/libretexts/libretexts.css"/> 
+<link rel="stylesheet" type="text/css" href="/webwork2_files/themes/libretexts/libretexts-coloring.css"/>
 <!-- JS Loads -->
 <script type="text/javascript" src="/webwork2_files/js/vendor/jquery/jquery.js"></script>
 <script type="text/javascript" src="/webwork2_files/mathjax/MathJax.js?config=TeX-MML-AM_HTMLorMML-full"></script>
@@ -30,20 +31,18 @@ $sticky_format = <<'ENDPROBLEMTEMPLATE';
 <script type="text/javascript" src="/webwork2_files/js/vendor/jquery/modules/jstorage.js"></script>
 <script type="text/javascript" src="/webwork2_files/js/apps/LocalStorage/localstorage.js"></script>
 <script type="text/javascript" src="/webwork2_files/js/apps/Problem/problem.js"></script>
-<script type="text/javascript" src="/webwork2_files/themes/math4/math4.js"></script>	
+<script type="text/javascript" src="/webwork2_files/themes/libretexts/libretexts.js"></script>	
 <script type="text/javascript" src="/webwork2_files/js/vendor/iframe-resizer/js/iframeResizer.contentWindow.min.js"></script>
 $problemHeadText
 
-<title>WeBWorK using host: $SITE_URL, format: sticky seed: $problemSeed</title>
+<title>WeBWorK using host: $SITE_URL, format: libretexts seed: $problemSeed</title>
 </head>
 <body>
 <div class="container-fluid">
 <div class="row-fluid">
-<div class="span12 problem">	
-<hr/>		
+<div class="span12 problem">		
 $answerTemplate
-<hr/>
-<form id="problemMainForm" class="problem-main-form" name="problemMainForm" action="$FORM_ACTION_URL" method="post">
+<form id="problemMainForm" class="problem-main-form" name="problemMainForm" action="$FORM_ACTION_URL" method="post" style="margin-bottom:-20px">
 <div id="problem_body" class="problem-content" $PROBLEM_LANG_AND_DIR>
 $problemText
 </div>
@@ -70,7 +69,7 @@ $LTIGradeMessage
 <input type="hidden" name="course_password" value="$course_password">
 <input type="hidden" name="displayMode" value="$displayMode">
 <input type="hidden" name="session_key" value="$session_key">
-<input type="hidden" name="outputformat" value="sticky">
+<input type="hidden" name="outputformat" value="libretexts">
 <input type="hidden" name="language" value="$formLanguage">
 <input type="hidden" name="showSummary" value="$showSummary">
 <input type="hidden" name="forcePortNumber" value="$forcePortNumber">
@@ -84,8 +83,24 @@ $LTIGradeMessage
 </div>
 </div>
 </div>
-<div id="footer">
-WeBWorK &copy; 1996-2019 | host: $SITE_URL | course: $courseID | format: sticky | theme: math4
+
+<!--  script for knowl-like object -->
+<script>
+	$(document).ready(function(){
+		$( ".clickme" ).click(function() {
+		  $( this).next().slideToggle( "slow", function() {
+			// Animation complete.
+		  });
+		});
+
+	   // jQuery methods go here...
+	});
+</script>
+<div class="clickme" id="version">
+<img height="16px" width="16px" src="https://demo.webwork.rochester.edu/webwork2_files/images/webwork_square.svg"/>
+</div>
+<div id="footer" style="display:none">
+WeBWorK &copy; 1996-2020 | host: $SITE_URL | course: $courseID | format: libretexts | theme: math4
 </div>
 
 <!-- Activate local storage js -->
@@ -95,4 +110,4 @@ WeBWorK &copy; 1996-2019 | host: $SITE_URL | course: $courseID | format: sticky 
 
 ENDPROBLEMTEMPLATE
 
-$sticky_format;
+$libretexts_format;

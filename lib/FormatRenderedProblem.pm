@@ -303,7 +303,8 @@ sub formatRenderedProblem {
 	my $answerTemplate = $tbl->answerTemplate;
 	my $color_input_blanks_script = $tbl->color_answer_blanks;
 	$tbl->imgGen->render(refresh => 1) if $tbl->displayMode eq 'images';
-
+	
+	my $JSONanswerTemplate = $tbl->JSONanswerTemplate;
 	# warn "imgGen is ", $tbl->imgGen;
 	#warn "answerOrder ", $tbl->answerOrder;
 	#warn "answersSubmitted ", $tbl->answersSubmitted;
@@ -430,7 +431,7 @@ EOS
 	$localStorageMessages.= CGI::p('Your overall score for this problem is'.'&nbsp;'.CGI::span({id=>'problem-overall-score'},''));
 	$localStorageMessages .= CGI::end_div();
 		
-	# my $pretty_print_self  = pretty_print($self);
+	#my $pretty_print_self  = pretty_print($self);
 
 	# Enable localized strings for the buttons:
 	my $STRING_Preview     = $mt->maketext("Preview My Answers");

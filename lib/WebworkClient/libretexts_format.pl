@@ -13,7 +13,7 @@ $libretexts_format = <<'ENDPROBLEMTEMPLATE';
 <link rel="stylesheet" type="text/css" href="/webwork2_files/css/jquery-ui-1.8.18.custom.css"/>
 <link rel="stylesheet" type="text/css" href="/webwork2_files/css/vendor/font-awesome/css/font-awesome.min.css"/>
 <link rel="stylesheet" type="text/css" href="/webwork2_files/css/knowlstyle.css"/>
-# contains overrides
+<!--  css overrides for libretexts -->
 <link rel="stylesheet" type="text/css" href="/webwork2_files/themes/libretexts/libretexts.css"/> 
 <link rel="stylesheet" type="text/css" href="/webwork2_files/themes/libretexts/libretexts-coloring.css"/>
 <!-- JS Loads -->
@@ -40,8 +40,17 @@ $problemHeadText
 <body>
 <div class="container-fluid">
 <div class="row-fluid">
-<div class="span12 problem">		
+<div class="span12 problem">
+<div class="answerTemplate">		
 $answerTemplate
+</div>
+<div class="JSONanswerTemplate">
+$JSONanswerTemplate
+</div>
+<div style="display:none">
+json&jwt: <textarea  id="JSONanswerTemplate" 
+	name="JSONanswerTemplate"  readonly>$JSONanswerTemplate </textarea>
+</div>
 <form id="problemMainForm" class="problem-main-form" name="problemMainForm" action="$FORM_ACTION_URL" method="post" style="margin-bottom:-20px">
 <div id="problem_body" class="problem-content" $PROBLEM_LANG_AND_DIR>
 $problemText
@@ -73,6 +82,7 @@ $LTIGradeMessage
 <input type="hidden" name="language" value="$formLanguage">
 <input type="hidden" name="showSummary" value="$showSummary">
 <input type="hidden" name="forcePortNumber" value="$forcePortNumber">
+
 
 <p>
 <input type="submit" name="preview"  value="$STRING_Preview" />

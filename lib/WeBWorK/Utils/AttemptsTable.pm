@@ -48,7 +48,8 @@ use 5.010;
  
 =head1 DESCRIPTION
 This module handles the formatting of the table which presents the results of analyzing a student's 
-answer to a WeBWorK problem.  It is used in Problem.pm, OpaqueServer.pm, standAlonePGproblemRender
+answer to a WeBWorK problem.  It is used in Problem.pm, OpaqueServer.pm, FormatRenderedProblem.pm, 
+and the standAlonePGproblemRender package.
 
 =head2 new
 
@@ -149,6 +150,8 @@ use strict;
 use warnings;
 use Scalar::Util 'blessed';
 use WeBWorK::Utils 'wwRound';
+use JSON;
+use Crypt::JWT qw(decode_jwt encode_jwt);
 use CGI;
 
 # Object contains hash of answer results
@@ -336,6 +339,25 @@ sub answerTemplate {
     $self->incorrect_ids(\@incorrect_ids);
     $answerTemplate;
 }
+
+sub JSONanswerTemplate {
+	my $self = shift;
+	my $rh_answers = $self->{answers};
+	my $hash_answer_template={};
+	return "" unless $self->answersSubmitted; # only print if there is at least one non-blank answer
+	my $answerNumber =0;
+	foreach my $ans_id(@{$self->answerOrder() }){
+		$answerNumber++;  # start with 1, this is also the row number
+		$hash_answer_template->{$answerNumber}={ans_id=>$ans_id,
+							answer =>$rh_answers->{$ans_id}, 
+							score =>$rh_answers->{$ans_id}->{score} }
+	}
+	my $JSON_answer_template = encode_json $hash_answer_template;
+	my $JWT_answer_template  = encode_jwt( payload =>$JSON_answer_template, alg=>"HS256", key=>"s1r1b1r1");
+	return $JSON_answer_template . "<br/>" . $JWT_answer_template;
+}
+
+
 #################################################
 
 sub previewAnswer {

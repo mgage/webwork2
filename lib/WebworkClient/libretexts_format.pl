@@ -45,12 +45,23 @@ $problemHeadText
 $answerTemplate
 </div>
 <div class="JSONanswerTemplate">
-$JSONanswerTemplate
+<p>
+json: $JSONanswerTemplate
+</p>
+
+<p>
+jwt:$JWTanswerTemplate
+</p>
+ 
 </div>
-<div style="display:none">
-json&jwt: <textarea  id="JSONanswerTemplate" 
-	name="JSONanswerTemplate"  readonly>$JSONanswerTemplate </textarea>
-</div>
+
+<form id="json_jwt_templates">
+json: <input type="text"  id="JSONanswerTemplate" 
+	name="JSONanswerTemplate"  value = $JSONanswerTemplate readonly>
+jwt: <input type="text"   name = "JWTanswerTemplate" id ="JWTanswerTemplate" 
+	value= $JWTanswerTemplate readonly>
+</form>
+
 <form id="problemMainForm" class="problem-main-form" name="problemMainForm" action="$FORM_ACTION_URL" method="post" style="margin-bottom:-20px">
 <div id="problem_body" class="problem-content" $PROBLEM_LANG_AND_DIR>
 $problemText

@@ -305,6 +305,7 @@ sub formatRenderedProblem {
 	$tbl->imgGen->render(refresh => 1) if $tbl->displayMode eq 'images';
 	
 	my $JSONanswerTemplate = $tbl->JSONanswerTemplate;
+	my $JWTanswerTemplate  = $tbl->JWTanswerTemplate;
 	# warn "imgGen is ", $tbl->imgGen;
 	#warn "answerOrder ", $tbl->answerOrder;
 	#warn "answersSubmitted ", $tbl->answersSubmitted;

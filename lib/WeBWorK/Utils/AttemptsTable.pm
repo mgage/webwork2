@@ -192,6 +192,7 @@ sub new {
 	$self->mk_ro_accessors(qw(showAnswerNumbers showAttemptAnswers showHeadline
 	                          showAttemptPreviews showAttemptResults 
 	                          showCorrectAnswers showSummary));
+	$self->mk_ro_accessors(qw( answerTemplate JSONanswerTemplate JWTanswerTemplate));
 	$self->mk_accessors(qw(correct_ids incorrect_ids showMessages  summary));
 	# sanity check and initialize imgGenerator.
 	_init($self, %options);
@@ -213,7 +214,10 @@ sub _init {
 	$self->{numCorrect}=0;
 	$self->{numBlanks}=0;
 	$self->{numEssay}=0;
-
+	
+	$self->make_answer_template;
+	$self->make_JSON_JWT_answer_templates;
+	
 	if ( $self->displayMode eq 'images') {
 		if ( blessed( $options{imgGen} ) ) {
 			$self->{imgGen} = $options{imgGen};
@@ -306,7 +310,7 @@ sub formatAnswerRow {
 # and create answer template if they have been
 #####################################################
 
-sub answerTemplate {
+sub make_answer_template {
 	my $self = shift;
 	my $rh_answers = $self->{answers};
 	my @tableRows;
@@ -337,10 +341,10 @@ sub answerTemplate {
     $answerTemplate = "" unless $self->answersSubmitted; # only print if there is at least one non-blank answer
     $self->correct_ids(\@correct_ids);
     $self->incorrect_ids(\@incorrect_ids);
-    $answerTemplate;
+    $self->{answerTemplate} = $answerTemplate;
 }
 
-sub JSONanswerTemplate {
+sub make_JSON_JWT_answer_templates {
 	my $self = shift;
 	my $rh_answers = $self->{answers};
 	my $hash_answer_template={};
@@ -352,11 +356,9 @@ sub JSONanswerTemplate {
 							answer =>$rh_answers->{$ans_id}, 
 							score =>$rh_answers->{$ans_id}->{score} }
 	}
-	my $JSON_answer_template = encode_json $hash_answer_template;
-	my $JWT_answer_template  = encode_jwt( payload =>$JSON_answer_template, alg=>"HS256", key=>"s1r1b1r1");
-	return $JSON_answer_template . "<br/>" . $JWT_answer_template;
+	$self->{JSONanswerTemplate} = encode_json $hash_answer_template;
+	$self->{JWTanswerTemplate}  = encode_jwt( payload =>$hash_answer_template, alg=>"HS256", key=>"s1r1b1r1");
 }
-
 
 #################################################
 

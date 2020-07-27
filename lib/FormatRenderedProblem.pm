@@ -268,7 +268,7 @@ sub formatRenderedProblem {
 	
 
 	my $previewMode      =  defined($self->{inputs_ref}->{preview})||0;
-	my $checkMode        =  defined($self->{inputs_ref}->{WWcheck})||0;
+	my $checkMode        =  defined($self->{inputs_ref}->{WWcheck})||0; #not yet used
 	my $submitMode       =  defined($self->{inputs_ref}->{WWsubmit})||0;
 	my $showCorrectMode  =  defined($self->{inputs_ref}->{WWcorrectAns})||0;
 	# problemUUID can be added to the request as a parameter.  

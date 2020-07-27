@@ -344,6 +344,9 @@ sub make_answer_template {
     $self->{answerTemplate} = $answerTemplate;
 }
 
+# this always displays all of the information in the answer_evaluator report
+# including the answers so this needs to be reported inside an encrypted JWT
+
 sub make_JSON_JWT_answer_templates {
 	my $self = shift;
 	my $rh_answers = $self->{answers};

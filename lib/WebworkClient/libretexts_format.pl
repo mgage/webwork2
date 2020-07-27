@@ -76,6 +76,7 @@ $localStorageMessages
 
 $LTIGradeMessage
 
+
 <input type="hidden" name="answersSubmitted" value="1"> 
 <input type="hidden" name="sourceFilePath" value = "$sourceFilePath">
 <input type="hidden" name="problemSource" value="$encoded_source"> 
@@ -130,5 +131,7 @@ WeBWorK &copy; 1996-2020 | host: $SITE_URL | course: $courseID | format: librete
 </html>
 
 ENDPROBLEMTEMPLATE
-
+# FIXME essentially all of the hidden inputs at the end need to be made secure
+# FIXME what about the session key? that belongs to daemon. can it be switched out
+# by someone else calling the daemon_course? when is the session key renewed?
 $libretexts_format;

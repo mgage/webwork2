@@ -53,7 +53,6 @@ jwt:$JWTanswerTemplate
 parent.postMessage( {type: 'answerJWT',JWT:'$JWTanswerTemplate'}, "*",);
 })</script>
  
-</div>
 
 <form id="json_jwt_templates">
 <!-- json: <input type="text"  id="JSONanswerTemplate" 

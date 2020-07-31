@@ -44,21 +44,13 @@ $problemHeadText
 <div class="answerTemplate">		
 $answerTemplate
 </div>
-<div class="JSONanswerTemplate">
-<p>
-json: $JSONanswerTemplate
-</p>
 
-<p>
-jwt:$JWTanswerTemplate
-</p>
- 
-</div>
 
 <form id="json_jwt_templates">
-json: <input type="text"  id="JSONanswerTemplate" 
+<!-- json: <input type="text"  id="JSONanswerTemplate" 
 	name="JSONanswerTemplate"  value = $JSONanswerTemplate readonly>
-jwt: <input type="text"   name = "JWTanswerTemplate" id ="JWTanswerTemplate" 
+-->
+<input type="hidden"   name = "JWTanswerTemplate" id ="JWTanswerTemplate" 
 	value= $JWTanswerTemplate readonly>
 </form>
 

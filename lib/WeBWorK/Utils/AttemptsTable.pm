@@ -347,17 +347,21 @@ sub make_answer_template {
 # this always displays all of the information in the answer_evaluator report
 # including the answers so this needs to be reported inside an encrypted JWT
 
+
 sub make_JSON_JWT_answer_templates {
 	my $self = shift;
+	return unless 
 	my $rh_answers = $self->{answers};
 	my $hash_answer_template={};
 	return "" unless $self->answersSubmitted; # only print if there is at least one non-blank answer
 	my $answerNumber =0;
-	foreach my $ans_id(@{$self->answerOrder() }){
+	foreach my $ans_id (@{$self->answerOrder() }){
 		$answerNumber++;  # start with 1, this is also the row number
-		$hash_answer_template->{$answerNumber}={ans_id=>$ans_id,
-							answer =>$rh_answers->{$ans_id}, 
-							score =>$rh_answers->{$ans_id}->{score} }
+		$hash_answer_template->{$answerNumber}=
+ 							 {ans_id=>$ans_id,
+ 							 answer =>%{$rh_answers->{$ans_id}}//(), #FIXME to_json/freeze method needed for blessed reference???
+ 							 score =>($rh_answers->{$ans_id}->{score})//0, 
+ 							 };
 	}
 	$self->{JSONanswerTemplate} = encode_json $hash_answer_template;
 	$self->{JWTanswerTemplate}  = encode_jwt( payload =>$hash_answer_template, alg=>"HS256", key=>"s1r1b1r1");

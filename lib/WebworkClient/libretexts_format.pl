@@ -35,7 +35,7 @@ $libretexts_format = <<'ENDPROBLEMTEMPLATE';
 <script type="text/javascript" src="/webwork2_files/js/vendor/iframe-resizer/js/iframeResizer.contentWindow.min.js"></script>
 $problemHeadText
 
-<title>WeBWorK using host: $SITE_URL, format: libretexts seed: $problemSeed</title>
+<title>WeBWorK using host: $SITE_URL, format: libretexts</title>
 </head>
 <body>
 <div class="container-fluid">
@@ -50,7 +50,8 @@ jwt:$JWTanswerTemplate
 </p>
 
 <script type="text/javascript">window.addEventListener('load',()=>{
-parent.postMessage( {type: 'answerJWT',JWT:'$JWTanswerTemplate'}, "*",);
+	if('$JWTanswerTemplate')
+		parent.postMessage( {type: 'answerJWT',JWT:'$JWTanswerTemplate'}, "*",);
 })</script>
  
 

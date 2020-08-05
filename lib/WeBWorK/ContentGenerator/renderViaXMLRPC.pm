@@ -189,6 +189,7 @@ sub pre_header_initialize {
 		$inputs_ref{sourceFilePath} = $payload->{sourceFilePath};
 		$inputs_ref{problemSeed} = $payload->{problemSeed};
 		$inputs_ref{jwt_payload} = $payload;
+		$problemSeed  = $inputs_ref{problemSeed};
 	}
 	unless ( $user_id && $courseName && $displayMode && $problemSeed) {
 		print CGI::ul( 

@@ -45,10 +45,6 @@ $problemHeadText
 $answerTemplate
 </div>
 
-<p>
-jwt:$JWTanswerTemplate
-</p>
-
 <script type="text/javascript">window.addEventListener('load',()=>{
 parent.postMessage( {type: 'answerJWT',JWT:'$JWTanswerTemplate'}, "*",);
 })</script>

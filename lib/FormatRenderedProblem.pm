@@ -60,6 +60,7 @@ eval {
 
 our %imagesModeOptions = %{$seed_ce->{pg}->{displayModeOptions}->{images}};
 our $site_url = $seed_ce->{server_root_url}//'';
+warn "creating image Generator";
 our $imgGen = WeBWorK::PG::ImageGenerator->new(
 		tempDir         => $seed_ce->{webworkDirs}->{tmp},
 		latex	        => $seed_ce->{externalPrograms}->{latex},
@@ -71,7 +72,7 @@ our $imgGen = WeBWorK::PG::ImageGenerator->new(
 		dvipng_align    => $imagesModeOptions{dvipng_align},
 		dvipng_depth_db => $imagesModeOptions{dvipng_depth_db},
 );
-
+warn "image Generator is $imgGen";
 
 sub new {
     my $invocant = shift;

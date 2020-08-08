@@ -380,7 +380,7 @@ sub previewAnswer {
 	# so we'll just deal with each case explicitly here. there's some code
 	# duplication that can be dealt with later by abstracting out dvipng/etc.
 	
-	my $tex = $answerResult->{preview_latex_string};
+	my $tex = $answerResult->{preview_latex_string}//'';
 	
 	return "" unless defined $tex and $tex ne "";
 	

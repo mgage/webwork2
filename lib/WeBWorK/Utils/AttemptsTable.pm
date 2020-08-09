@@ -184,7 +184,8 @@ sub new {
 	    showCorrectAnswers  => $options{showCorrectAnswers}//1,    # show the correct answers
 	    showSummary         => $options{showSummary}//1,           # show summary to students
 	    maketext            => $options{maketext}//sub {return @_},  # pointer to the maketext subroutine
-	    imgGen              => undef,                              # created in _init method
+	    imgGen              => undef, 
+	                                 # created in _init method
 	};
 	bless $self, $class;
 	# create read only accessors/mutators

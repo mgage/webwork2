@@ -152,44 +152,63 @@ sub pre_header_initialize {
 	$inputs_ref{sourceFilePath} = $inputs_ref{custom_sourcefilepath} if $inputs_ref{custom_sourcefilepath};
 	$inputs_ref{outputformat} = $inputs_ref{custom_outputformat} if $inputs_ref{custom_outputformat};
 	
+
+	# some additional override operations are done if there is a JSONWebToken (JWT) present
+	my $webwork_jwt  = $inputs_ref{webworkJWT}//'';
+	if ($webwork_jwt) {
+		my $sourceFilePath = $inputs_ref{sourceFilePath}//'';
+		my $payload = decode_jwt(token=>$webwork_jwt, key=>'s1r1b1r1', accepted_alg=>'HS256'); # TODO REMOVE INSECURE DEVELOPMENT KEY
+		#TODO add validation of expiration (exp), issue time (iat), not before (nbf), issuer (iss), and audience (aud).
+		# verify_exp=>1, verify_iat=>1, verify_nbf=>1, verify_exp=>1, verify_aud=>"webwork", verify_iss=>""
+		#TODO switch to asymmetric keys and JWT encrpytion [JSON Web Encryption (JWE)].
+
+
+		#override inputs_ref if keys are present
+		$inputs_ref{userID} = $payload->{userID} if $payload->{userID};
+		$inputs_ref{courseID} = $payload->{courseID} if $payload->{courseID};
+		$inputs_ref{displayMode} = $payload->{displayMode} if $payload->{displayMode};
+		$inputs_ref{course_password} = $payload->{course_password} if $payload->{course_password};
+		$inputs_ref{answersSubmitted} = $payload->{answersSubmitted} if $payload->{answersSubmitted};
+		$inputs_ref{problemSeed} = $payload->{problemSeed} if $payload->{problemSeed};
+		$inputs_ref{problemUUID} = $payload->{problemUUID} if $payload->{problemSeed};
+		$inputs_ref{sourceFilePath} = $payload->{sourceFilePath} if $payload->{sourceFilePath};
+		$inputs_ref{outputformat} = $payload->{outputformat} if $payload->{outputformat};
+
+		$inputs_ref{jwt_payload} = $payload; 
+
+
+		# sanity check
+		my $debug=0;
+		if ($debug){
+			
+			#There is a bug here when trying to do sourceFilePath or displayMode
+			print CGI::ul( 
+				  CGI::h1("JWT is present"),
+				  CGI::li(CGI::escapeHTML([
+					"webworkJWT: |$webwork_jwt|",
+					"userID: |$inputs_ref{userID}|",
+					"courseID: |$inputs_ref{courseID}|",
+					#"sourceFilePath: |$inputs_ref{sourceFilePath}|",
+					#"displayMode: |$inputs_ref{displayMode}|",
+					"problemSeed: |$inputs_ref{problemSeed}|"
+				  ])
+				  )
+			);
+			#print (" | ", encode_json($payload), "<br/>");
+			my $envir = $payload->{envir};
+			if ($envir){
+				print "envir: ", encode_json( $envir), "<br/>";
+			}
+			#print '<b/>',join(" | ", %$envir);
+		}
+	}
+
 	# dereference some variables for sanity check and for error reporting
 	my $user_id      = $inputs_ref{userID};
 	my $courseName   = $inputs_ref{courseID};
 	my $displayMode  = $inputs_ref{displayMode};
 	my $problemSeed  = $inputs_ref{problemSeed};
-	# some additional operations are done if there is a JavaWebToken present
-	my $webwork_jwt  = $inputs_ref{webworkJWT}//'';
 	
-
-	if ($webwork_jwt) {
-		my $sourceFilePath = $inputs_ref{sourceFilePath}//'';
-		my $payload = decode_jwt(token=>$webwork_jwt, key=>'s1r1b1r1');
-		# sanity check
-		my $debug=0;
-		if ($debug){
-			
-
-			print CGI::ul( 
-				  CGI::h1("JWT is present"),
-				  CGI::li(CGI::escapeHTML([
-					"webworkJWT: |$webwork_jwt|",
-					"userID: |$user_id|", 
-					"courseID: |$courseName|",	
-					"sourceFilePath: |$sourceFilePath|",
-					"displayMode: |$displayMode|", 
-					"problemSeed: |$problemSeed|",
-				  ])
-				  )
-			);
-			print join(" | ", %{$payload});
-			my $envir = $payload->{envir};
-			print "envir: ", encode_json( $envir), "<br/>";
-			#print '<b/>',join(" | ", %$envir);
-		}
-		$inputs_ref{sourceFilePath} = $payload->{sourceFilePath};
-		$inputs_ref{problemSeed} = $payload->{problemSeed};
-		$inputs_ref{jwt_payload} = $payload;
-	}
 	unless ( $user_id && $courseName && $displayMode && $problemSeed) {
 		print CGI::ul( 
 		      CGI::h1("Missing essential data in web dataform:"),
@@ -217,6 +236,7 @@ sub pre_header_initialize {
 	$xmlrpc_client->{courseID}        = $inputs_ref{courseID};
 	$xmlrpc_client->{outputformat}    = $inputs_ref{outputformat};
 	$xmlrpc_client->{sourceFilePath}  = $inputs_ref{sourceFilePath};
+	$xmlrpc_client->{webworkJWT}      = $inputs_ref{webworkJWT};
 	#$xmlrpc_client->{jwt_payload}     = $inputs_ref{jwt_payload}; #FIXME doesn't seem to be needed at this level
 	$xmlrpc_client->{inputs_ref}      = \%inputs_ref;  # contains form data
 

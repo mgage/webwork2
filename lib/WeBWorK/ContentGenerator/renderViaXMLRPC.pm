@@ -168,27 +168,32 @@ sub pre_header_initialize {
 	$input_hash{sourceFilePath} = $input_hash{custom_sourcefilepath} if $input_hash{custom_sourcefilepath};
 	$input_hash{outputformat} = $input_hash{custom_outputformat} if $input_hash{custom_outputformat};
 	
-	# some additional operations are done if there is a JavaWebToken present
-	# we first dereference it to simplify the code
-	my $webwork_jwt  = $input_hash{webworkJWT}//'';
 
-	#dereference these variables for the next two conditional statements 
+	#dereference these variables for error reporting in the next two conditional statements 
 	my $user_id      = $input_hash{userID};
 	my $courseName   = $input_hash{courseID};
 	my $displayMode  = $input_hash{displayMode};
 	my $problemSeed  = $input_hash{problemSeed};
 
 	# some additional override operations are done if there is a JSONWebToken (JWT) present
-	my $webwork_jwt  = $input_hash{webworkJWT}//'';
-	if ($webwork_jwt) {
+	my $webworkJWT  = $input_hash{webworkJWT}//'';
+	if ($webworkJWT) {
 		my $sourceFilePath = $input_hash{sourceFilePath}//'';
-		my $payload = decode_jwt(token=>$webwork_jwt, key=>'s1r1b1r1', accepted_alg=>'HS256'); # TODO REMOVE INSECURE DEVELOPMENT KEY
+		my $payload = decode_jwt(token=>$webworkJWT, key=>'s1r1b1r1', accepted_alg=>'HS256'); # TODO REMOVE INSECURE DEVELOPMENT KEY
 		#TODO add validation of expiration (exp), issue time (iat), not before (nbf), issuer (iss), and audience (aud).
 		# verify_exp=>1, verify_iat=>1, verify_nbf=>1, verify_exp=>1, verify_aud=>"webwork", verify_iss=>""
 		#TODO switch to asymmetric keys and JWT encrpytion [JSON Web Encryption (JWE)].
 
+		#store JWT and decoded payload for future use. 
+		$input_hash{jwt_payload}=$payload;  
+		$input_hash{webworkJWT}  # encoded JWT passed on
 
 		#override input_hash if keys are present
+				# override protected input_hash values from the payload 
+		for my $key (qw(sourceFilePath problemSeed)){
+					$input_hash{$key} = $payload->{$key};
+		}
+
 		$input_hash{userID} = $payload->{userID} if $payload->{userID};
 		$input_hash{courseID} = $payload->{courseID} if $payload->{courseID};
 		$input_hash{displayMode} = $payload->{displayMode} if $payload->{displayMode};
@@ -199,8 +204,7 @@ sub pre_header_initialize {
 		$input_hash{sourceFilePath} = $payload->{sourceFilePath} if $payload->{sourceFilePath};
 		$input_hash{outputformat} = $payload->{outputformat} if $payload->{outputformat};
 
-		$input_hash{jwt_payload} = $payload; 
-
+		 
 		# sanity check
 		my $debug=0;
 		if ($debug){ 
@@ -210,7 +214,7 @@ sub pre_header_initialize {
 			print CGI::ul( 
 				  CGI::h1("JWT is present"),
 				  CGI::li(CGI::escapeHTML([
-					"webworkJWT: |$webwork_jwt|",
+					"decoded webworkJWT: |$webworkJWT|",
 					"userID: |$input_hash{userID}|",
 					"courseID: |$input_hash{courseID}|",
 					"sourceFilePath: |$input_hash{sourceFilePath}|",
@@ -226,20 +230,9 @@ sub pre_header_initialize {
 			}
 		}
 
-		# override protected input_hash values from the payload 
-		for my $key (qw(sourceFilePath problemSeed)){
-					$input_hash{$key} = $payload->{$key};
-		}
-		# $input_hash{jwt_payload} # passed on 
-		# $input_hash{webworkJWT}  # encoded JWT passed on
 
 	}
 
-	# dereference some variables for sanity check and for error reporting
-	my $user_id      = $input_hash{userID};
-	my $courseName   = $input_hash{courseID};
-	my $displayMode  = $input_hash{displayMode};
-	my $problemSeed  = $input_hash{problemSeed};
 	
 	unless ( $user_id && $courseName && $displayMode && $problemSeed) {
 		#sanity check for required variables
@@ -250,7 +243,7 @@ sub pre_header_initialize {
 		      	"courseID: |$courseName|",	
 		        "displayMode: |$displayMode|", 
 		        "problemSeed: |$problemSeed|",
-		        "webworkJWT: |$webwork_jwt|",
+		        "webworkJWT: |$webworkJWT|",
 		      ])));
 		return;
 	}

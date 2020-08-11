@@ -194,7 +194,7 @@ sub pre_header_initialize {
 		                course_password answersSubmitted problemSeed problemUUID sourceFilePath 
 		                outputformat)
 		            ) {
-					$input_hash{$key} = $payload->{$key} if defined $payload{$key};
+					$input_hash{$key} = $payload->{$key} if defined ($payload->{$key});
 					# use defined to allow zero values in payload to override input_hash
 		}
 		 

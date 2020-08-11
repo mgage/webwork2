@@ -186,24 +186,17 @@ sub pre_header_initialize {
 
 		#store JWT and decoded payload for future use. 
 		$input_hash{jwt_payload}=$payload;  
-		$input_hash{webworkJWT}  # encoded JWT passed on
+		#$input_hash{webworkJWT};  # encoded JWT already present and is  passed on
 
 		#override input_hash if keys are present
-				# override protected input_hash values from the payload 
-		for my $key (qw(sourceFilePath problemSeed)){
-					$input_hash{$key} = $payload->{$key};
+		# override protected input_hash values from the payload 
+		for my $key (qw(userID courseID displayMode
+		                course_password answersSubmitted problemSeed problemUUID sourceFilePath 
+		                outputformat)
+		            ) {
+					$input_hash{$key} = $payload->{$key} if defined $payload{$key};
+					# use defined to allow zero values in payload to override input_hash
 		}
-
-		$input_hash{userID} = $payload->{userID} if $payload->{userID};
-		$input_hash{courseID} = $payload->{courseID} if $payload->{courseID};
-		$input_hash{displayMode} = $payload->{displayMode} if $payload->{displayMode};
-		$input_hash{course_password} = $payload->{course_password} if $payload->{course_password};
-		$input_hash{answersSubmitted} = $payload->{answersSubmitted} if $payload->{answersSubmitted};
-		$input_hash{problemSeed} = $payload->{problemSeed} if $payload->{problemSeed};
-		$input_hash{problemUUID} = $payload->{problemUUID} if $payload->{problemSeed};
-		$input_hash{sourceFilePath} = $payload->{sourceFilePath} if $payload->{sourceFilePath};
-		$input_hash{outputformat} = $payload->{outputformat} if $payload->{outputformat};
-
 		 
 		# sanity check
 		my $debug=0;

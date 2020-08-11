@@ -178,40 +178,71 @@ sub pre_header_initialize {
 	my $displayMode  = $input_hash{displayMode};
 	my $problemSeed  = $input_hash{problemSeed};
 
+	# some additional override operations are done if there is a JSONWebToken (JWT) present
+	my $webwork_jwt  = $input_hash{webworkJWT}//'';
 	if ($webwork_jwt) {
 		my $sourceFilePath = $input_hash{sourceFilePath}//'';
-		my $payload = decode_jwt(token=>$webwork_jwt, key=>'s1r1b1r1');
-		$input_hash{jwt_payload} = $payload;  
+		my $payload = decode_jwt(token=>$webwork_jwt, key=>'s1r1b1r1', accepted_alg=>'HS256'); # TODO REMOVE INSECURE DEVELOPMENT KEY
+		#TODO add validation of expiration (exp), issue time (iat), not before (nbf), issuer (iss), and audience (aud).
+		# verify_exp=>1, verify_iat=>1, verify_nbf=>1, verify_exp=>1, verify_aud=>"webwork", verify_iss=>""
+		#TODO switch to asymmetric keys and JWT encrpytion [JSON Web Encryption (JWE)].
+
+
+		#override input_hash if keys are present
+		$input_hash{userID} = $payload->{userID} if $payload->{userID};
+		$input_hash{courseID} = $payload->{courseID} if $payload->{courseID};
+		$input_hash{displayMode} = $payload->{displayMode} if $payload->{displayMode};
+		$input_hash{course_password} = $payload->{course_password} if $payload->{course_password};
+		$input_hash{answersSubmitted} = $payload->{answersSubmitted} if $payload->{answersSubmitted};
+		$input_hash{problemSeed} = $payload->{problemSeed} if $payload->{problemSeed};
+		$input_hash{problemUUID} = $payload->{problemUUID} if $payload->{problemSeed};
+		$input_hash{sourceFilePath} = $payload->{sourceFilePath} if $payload->{sourceFilePath};
+		$input_hash{outputformat} = $payload->{outputformat} if $payload->{outputformat};
+
+		$input_hash{jwt_payload} = $payload; 
 
 		# sanity check
 		my $debug=0;
 		if ($debug){ 
-			
+			#unit test of passing in variables
+			#There is a bug here when trying to do sourceFilePath or displayMode????
+
 			print CGI::ul( 
 				  CGI::h1("JWT is present"),
 				  CGI::li(CGI::escapeHTML([
 					"webworkJWT: |$webwork_jwt|",
-					"userID: |$user_id|", 
-					"courseID: |$courseName|",	
-					"sourceFilePath: |$sourceFilePath|",
-					"displayMode: |$displayMode|", 
-					"problemSeed: |$problemSeed|",
+					"userID: |$input_hash{userID}|",
+					"courseID: |$input_hash{courseID}|",
+					"sourceFilePath: |$input_hash{sourceFilePath}|",
+					"displayMode: |$input_hash{displayMode}|",
+					"problemSeed: |$input_hash{problemSeed}|"
 				  ])
 				  )
 			);
-			print join(" | ", %{$payload});
+			#print (" | ", encode_json($payload), "<br/>");
 			my $envir = $payload->{envir};
-			print "envir: ", encode_json( $envir), "<br/>";
-			#print '<b/>',join(" | ", %$envir);
+			if ($envir){
+				print "envir: ", encode_json( $envir), "<br/>";
+			}
 		}
+
 		# override protected input_hash values from the payload 
-		$input_hash{sourceFilePath} = $payload->{sourceFilePath};
-		$input_hash{problemSeed} = $payload->{problemSeed};
+		for my $key (qw(sourceFilePath problemSeed)){
+					$input_hash{$key} = $payload->{$key};
+		}
 		# $input_hash{jwt_payload} # passed on 
 		# $input_hash{webworkJWT}  # encoded JWT passed on
+
 	}
+
+	# dereference some variables for sanity check and for error reporting
+	my $user_id      = $input_hash{userID};
+	my $courseName   = $input_hash{courseID};
+	my $displayMode  = $input_hash{displayMode};
+	my $problemSeed  = $input_hash{problemSeed};
+	
 	unless ( $user_id && $courseName && $displayMode && $problemSeed) {
-		#sanity check 
+		#sanity check for required variables
 		print CGI::ul( 
 		      CGI::h1("Missing essential data in web dataform:"),
 			  CGI::li(CGI::escapeHTML([
@@ -245,6 +276,7 @@ sub pre_header_initialize {
 	# $xmlrpc_client->{webworkJWT}     = $input_hash{webworkJWT}//''; can be obtained from input_hash
 	# in addition to the arguments above the input_hash contains parameters for the pg_environment
 	$xmlrpc_client->{input_hash}      = \%input_hash;  # contains GET parameters from form
+
 
 	##############################
 	# xmlrpc_client calls webservice via

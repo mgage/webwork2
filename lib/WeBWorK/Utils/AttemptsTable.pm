@@ -48,7 +48,8 @@ use 5.010;
  
 =head1 DESCRIPTION
 This module handles the formatting of the table which presents the results of analyzing a student's 
-answer to a WeBWorK problem.  It is used in Problem.pm, OpaqueServer.pm, standAlonePGproblemRender
+answer to a WeBWorK problem.  It is used in Problem.pm, OpaqueServer.pm, FormatRenderedProblem.pm, 
+and the standAlonePGproblemRender package.
 
 =head2 new
 
@@ -149,6 +150,8 @@ use strict;
 use warnings;
 use Scalar::Util 'blessed';
 use WeBWorK::Utils 'wwRound';
+use JSON;
+use Crypt::JWT qw(decode_jwt encode_jwt);
 use CGI;
 
 # Object contains hash of answer results
@@ -181,7 +184,8 @@ sub new {
 	    showCorrectAnswers  => $options{showCorrectAnswers}//1,    # show the correct answers
 	    showSummary         => $options{showSummary}//1,           # show summary to students
 	    maketext            => $options{maketext}//sub {return @_},  # pointer to the maketext subroutine
-	    imgGen              => undef,                              # created in _init method
+	    imgGen              => undef, 
+	                                 # created in _init method
 	};
 	bless $self, $class;
 	# create read only accessors/mutators
@@ -189,6 +193,7 @@ sub new {
 	$self->mk_ro_accessors(qw(showAnswerNumbers showAttemptAnswers showHeadline
 	                          showAttemptPreviews showAttemptResults 
 	                          showCorrectAnswers showSummary));
+	$self->mk_ro_accessors(qw( answerTemplate JSONanswerTemplate JWTanswerTemplate));
 	$self->mk_accessors(qw(correct_ids incorrect_ids showMessages  summary));
 	# sanity check and initialize imgGenerator.
 	_init($self, %options);
@@ -210,7 +215,10 @@ sub _init {
 	$self->{numCorrect}=0;
 	$self->{numBlanks}=0;
 	$self->{numEssay}=0;
-
+	
+	$self->make_answer_template;
+	$self->make_JSON_JWT_answer_templates;
+	
 	if ( $self->displayMode eq 'images') {
 		if ( blessed( $options{imgGen} ) ) {
 			$self->{imgGen} = $options{imgGen};
@@ -303,7 +311,7 @@ sub formatAnswerRow {
 # and create answer template if they have been
 #####################################################
 
-sub answerTemplate {
+sub make_answer_template {
 	my $self = shift;
 	my $rh_answers = $self->{answers};
 	my @tableRows;
@@ -334,8 +342,32 @@ sub answerTemplate {
     $answerTemplate = "" unless $self->answersSubmitted; # only print if there is at least one non-blank answer
     $self->correct_ids(\@correct_ids);
     $self->incorrect_ids(\@incorrect_ids);
-    $answerTemplate;
+    $self->{answerTemplate} = $answerTemplate;
 }
+
+# this always displays all of the information in the answer_evaluator report
+# including the answers so this needs to be reported inside an encrypted JWT
+
+
+sub make_JSON_JWT_answer_templates {
+	my $self = shift;
+	return unless 
+	my $rh_answers = $self->{answers};
+	my $hash_answer_template={};
+	return "" unless $self->answersSubmitted; # only print if there is at least one non-blank answer
+	my $answerNumber =0;
+	foreach my $ans_id (@{$self->answerOrder() }){
+		$answerNumber++;  # start with 1, this is also the row number
+		$hash_answer_template->{$answerNumber}=
+ 							 {ans_id=>$ans_id,
+ 							 answer =>%{$rh_answers->{$ans_id}}//(), #FIXME to_json/freeze method needed for blessed reference???
+ 							 score =>($rh_answers->{$ans_id}->{score})//0, 
+ 							 };
+	}
+	$self->{JSONanswerTemplate} = encode_json $hash_answer_template;
+	$self->{JWTanswerTemplate}  = encode_jwt( payload =>$hash_answer_template, alg=>"HS256", key=>"s1r1b1r1");
+}
+
 #################################################
 
 sub previewAnswer {
@@ -349,7 +381,7 @@ sub previewAnswer {
 	# so we'll just deal with each case explicitly here. there's some code
 	# duplication that can be dealt with later by abstracting out dvipng/etc.
 	
-	my $tex = $answerResult->{preview_latex_string};
+	my $tex = $answerResult->{preview_latex_string}//'';
 	
 	return "" unless defined $tex and $tex ne "";
 	

@@ -37,7 +37,8 @@ use warnings;
 use WebworkClient;
 use WeBWorK::Debug;
 use CGI;
-
+use JSON;
+use Crypt::JWT qw( decode_jwt encode_jwt);
 =head1 Description
 
 
@@ -137,36 +138,108 @@ sub pre_header_initialize {
 	my ($self) = @_;
 	my $r = $self->r;
 	# Note: Vars helps handle things like checkbox 'packed' data;
-	my %inputs_ref =  WeBWorK::Form->new_from_paramable($r)->Vars ;
-
+	my %input_hash =  WeBWorK::Form->new_from_paramable($r)->Vars ;
+    # input_hash contains the GET parameters(and possibly POST parameters) from the call to html2xml
+     
+	# these parameters are required to set up the PG_renderer
+	# rendering anonymously 
+	#    userID = daemon
+	#    courseID = daemon_course
+	#    course_password = daemon   (actually the password for userID in courseID)
+	#   (anonymous is sometimes used instead of daemon 
+	#         -- depends on how the rendering course site is set up)
+	#         -- the rendering course (daemon_course) is a standard WW course but for safety 
+	#         -- it should not have many users enrolled besides "daemon"
+	
 	# When passing parameters via an LMS you get "custom_" put in front of them. So lets
-	# try to clean that up
-	$inputs_ref{userID} = $inputs_ref{custom_userid} if $inputs_ref{custom_userid};
-	$inputs_ref{courseID} = $inputs_ref{custom_courseid} if $inputs_ref{custom_courseid};
-	$inputs_ref{displayMode} = $inputs_ref{custom_displaymode} if $inputs_ref{custom_displaymode};
-	$inputs_ref{course_password} = $inputs_ref{custom_course_password} if $inputs_ref{custom_course_password};
-	$inputs_ref{answersSubmitted} = $inputs_ref{custom_answerssubmitted} if $inputs_ref{custom_answerssubmitted};
-	$inputs_ref{problemSeed} = $inputs_ref{custom_problemseed} if $inputs_ref{custom_problemseed};
-	$inputs_ref{problemUUID} = $inputs_ref{problemUUID}//$inputs_ref{problemIdentifierPrefix}; # earlier version of problemUUID
-	$inputs_ref{sourceFilePath} = $inputs_ref{custom_sourcefilepath} if $inputs_ref{custom_sourcefilepath};
-	$inputs_ref{outputformat} = $inputs_ref{custom_outputformat} if $inputs_ref{custom_outputformat};
 	
+
+	$input_hash{userID} = $input_hash{custom_userid} if $input_hash{custom_userid};
+	$input_hash{courseID} = $input_hash{custom_courseid} if $input_hash{custom_courseid};
+	$input_hash{displayMode} = $input_hash{custom_displaymode} if $input_hash{custom_displaymode};
+	$input_hash{course_password} = $input_hash{custom_course_password} if $input_hash{custom_course_password};
 	
-	my $user_id      = $inputs_ref{userID};
-	my $courseName   = $inputs_ref{courseID};
-	my $displayMode  = $inputs_ref{displayMode};
-	my $problemSeed  = $inputs_ref{problemSeed};
+	# the following parameters are destined for the pg_environment variable (envir)
+	# and are not otherwise needed to set up the renderer 
 	
-	# FIXME -- it might be better to send this error if the input is not all correct
-	# rather than trying to set defaults such as displaymode
+	$input_hash{answersSubmitted} = $input_hash{custom_answerssubmitted} if $input_hash{custom_answerssubmitted};
+	$input_hash{problemSeed} = $input_hash{custom_problemseed} if $input_hash{custom_problemseed};
+	$input_hash{problemUUID} = $input_hash{problemUUID}//$input_hash{problemIdentifierPrefix}; # earlier version of problemUUID
+	$input_hash{sourceFilePath} = $input_hash{custom_sourcefilepath} if $input_hash{custom_sourcefilepath};
+	$input_hash{outputformat} = $input_hash{custom_outputformat} if $input_hash{custom_outputformat};
+	
+
+	#dereference these variables for error reporting in the next two conditional statements 
+	my $user_id      = $input_hash{userID};
+	my $courseName   = $input_hash{courseID};
+	my $displayMode  = $input_hash{displayMode};
+	my $problemSeed  = $input_hash{problemSeed};
+
+	# some additional override operations are done if there is a JSONWebToken (JWT) present
+	my $webworkJWT  = $input_hash{webworkJWT}//'';
+	if ($webworkJWT) {
+		my $sourceFilePath = $input_hash{sourceFilePath}//'';
+		my $payload = decode_jwt(token=>$webworkJWT, key=>'s1r1b1r1', accepted_alg=>'HS256'); # TODO REMOVE INSECURE DEVELOPMENT KEY
+		#TODO add validation of expiration (exp), issue time (iat), not before (nbf), issuer (iss), and audience (aud).
+		# verify_exp=>1, verify_iat=>1, verify_nbf=>1, verify_exp=>1, verify_aud=>"webwork", verify_iss=>""
+		#TODO switch to asymmetric keys and JWT encrpytion [JSON Web Encryption (JWE)].
+
+		#store JWT and decoded payload for future use. 
+		$input_hash{jwt_payload}=$payload;  
+		#$input_hash{webworkJWT};  # encoded JWT already present and is  passed on
+
+		#override input_hash if keys are present
+		# override protected input_hash values from the payload 
+		for my $key (qw(userID courseID 
+		                course_password answersSubmitted problemSeed problemUUID sourceFilePath 
+		                outputformat)
+		            ) {
+					$input_hash{$key} = $payload->{$key} if  ($payload->{$key});
+					# use defined to allow zero values in payload to override input_hash
+		}
+		 
+		# sanity check
+		my $debug=1;
+		if ($debug){ 
+			#unit test of passing in variables
+			#There is a bug here when trying to do sourceFilePath or displayMode????
+
+			print CGI::ul( 
+				  CGI::h1("JWT is present"),
+				  CGI::li(CGI::escapeHTML([
+					"webworkJWT: |$webworkJWT|",
+					"userID: |$input_hash{userID}|",
+					"courseID: |$input_hash{courseID}|",
+					"sourceFilePath: |$input_hash{sourceFilePath}|",
+					"displayMode: |$input_hash{displayMode}|",
+					"problemSeed: |$input_hash{problemSeed}|",
+					"jwt_payload: |",encode_json($input_hash{jwt_payload}),"|",
+				  ])
+				  )
+			);
+			#print (" | ", encode_json($payload), "<br/>");
+			#my $envir = $payload->{envir};
+			#if ($envir){
+			#	print "envir: |", encode_json( $envir), "|<br/>";
+			#}
+		}
+		# emergency hacks   FIXME
+	
+	} # end jwt special case
+
+	$input_hash{envir}->{displayMode} = $input_hash{displayMode};
+	$input_hash{envir}->{problemSeed} = $input_hash{problemSeed};
+	
 	unless ( $user_id && $courseName && $displayMode && $problemSeed) {
+		#sanity check for required variables
 		print CGI::ul( 
 		      CGI::h1("Missing essential data in web dataform:"),
 			  CGI::li(CGI::escapeHTML([
 		      	"userID: |$user_id|", 
 		      	"courseID: |$courseName|",	
 		        "displayMode: |$displayMode|", 
-		        "problemSeed: |$problemSeed|"
+		        "problemSeed: |$problemSeed|",
+		        "webworkJWT: |$webworkJWT|",
 		      ])));
 		return;
 	}
@@ -175,27 +248,33 @@ sub pre_header_initialize {
     #######################
     my $xmlrpc_client = new WebworkClient;
 
-	$xmlrpc_client ->encoded_source($r->param('problemSource')) ; # this source has already been encoded
-	$xmlrpc_client-> site_url($SITE_URL);
-	$xmlrpc_client->{form_action_url} = $FORM_ACTION_URL;
-	$xmlrpc_client->{userID}          = $inputs_ref{userID};
-	$xmlrpc_client->{course_password} = $inputs_ref{course_password};
-	$xmlrpc_client->{site_password}   = $XML_PASSWORD;
-	$xmlrpc_client->{session_key}     = $inputs_ref{session_key};
-	$xmlrpc_client->{courseID}        = $inputs_ref{courseID};
-	$xmlrpc_client->{outputformat}    = $inputs_ref{outputformat};
-	$xmlrpc_client->{sourceFilePath}  = $inputs_ref{sourceFilePath};
-	$xmlrpc_client->{inputs_ref} = \%inputs_ref;  # contains form data
-	# print STDERR WebworkClient::pretty_print($r->{paramcache});
-	
+	# these are toplevel items in the WebworkClient object
+	$xmlrpc_client->encoded_source($r->param('problemSource')) ; 
+	     # this source, if it exists, has already been encoded in base64.
+	$xmlrpc_client->site_url($SITE_URL);  # the url of the WebworkWebservice
+	$xmlrpc_client->{form_action_url} = $FORM_ACTION_URL;  # the action to placed in the return HTML form
+	$xmlrpc_client->{userID}          = $input_hash{userID};
+	$xmlrpc_client->{courseID}        = $input_hash{courseID};
+	$xmlrpc_client->{course_password} = $input_hash{course_password}; #(password for userID in courseID )
+	$xmlrpc_client->{site_password}   = $XML_PASSWORD; # fixed for all courses in the site,
+													   #  screens for spam -- not yet used much yet
+	$xmlrpc_client->{session_key}     = $input_hash{session_key}; # can be used instead of password
+	$xmlrpc_client->{outputformat}    = $input_hash{outputformat};
+	$xmlrpc_client->{sourceFilePath}  = $input_hash{sourceFilePath}; #for fetching problemSource
+	                                             # from files stored on the WebworkWebservice server (e.g. OPL) 
+	# $xmlrpc_client->{webworkJWT}     = $input_hash{webworkJWT}//''; can be obtained from input_hash
+	# in addition to the arguments above the input_hash contains parameters for the pg_environment
+	$xmlrpc_client->{input_hash}      = \%input_hash;  # contains GET parameters from form
+
+
 	##############################
-	# xmlrpc_client calls webservice to have problem rendered
-	#
+	# xmlrpc_client calls webservice via
+	# xmlrpcCall() to have problem rendered by WebworkWebservice::RenderProblem.pl
 	# and stores the resulting HTML output in $self->return_object
 	# from which it will eventually be returned to the browser
 	#
 	##############################
-	if ( $xmlrpc_client->xmlrpcCall('renderProblem', $xmlrpc_client->{inputs_ref}) )    {
+	if ( $xmlrpc_client->xmlrpcCall('renderProblem', $xmlrpc_client->{input_hash}) )    {
 			$self->{output} = $xmlrpc_client->formatRenderedProblem ;
 	} else {
 		$self->{output}= $xmlrpc_client->return_object;  # error report

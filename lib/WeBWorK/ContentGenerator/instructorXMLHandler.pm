@@ -433,7 +433,7 @@ sub content {
 		# it behaves differently when re-randomization in the library takes place
 		# then during the initial rendering. 
 		# print only the text field (not the ra_out field)
-	        # and print the text directly without formatting.
+	    # and print the text directly without formatting.
 	    
 		if ($xmlrpc_client->return_object->{problem_out}->{text}) {
 			print $xmlrpc_client->return_object->{problem_out}->{text};

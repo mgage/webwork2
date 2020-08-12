@@ -1,4 +1,14 @@
-$sticky_format = <<'ENDPROBLEMTEMPLATE';
+
+
+
+
+warn qq{--$curlCommand --request POST -H 'Accept: application/json' -H 
+"Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNTk2NjM0OTkyLCJleHAiOjE1OTY3MjEzOTIsIm5iZiI6MTU5NjYzNDk5MiwianRpIjoiTWQybzUxOEg1UHNMUlR3aiIsInN1YiI6MSwicHJ2IjoiODdlMGFmMWVmOWZkMTU4MTJmZGVjOTcxNTNhMTRlMGIwNDc1NDZhYSIsInVzZXJfaWQiOjEsIndlYndvcmsiOiJibGFoIGJsYWggYmxhaCBzdHVmZiJ9.aazV1oZ1L0kxoGY6Hx1seCXR_CaCKnzBH0Yl_iawJGs" 
+https://dev.adapt.libretexts.org/api/jwt-test
+}
+
+
+$libretexts_format = <<'ENDPROBLEMTEMPLATE';
 
 <!DOCTYPE html>
 <html $COURSE_LANG_AND_DIR>
@@ -12,9 +22,10 @@ $sticky_format = <<'ENDPROBLEMTEMPLATE';
 <link rel="stylesheet" type="text/css" href="/webwork2_files/js/vendor/bootstrap/css/bootstrap-responsive.css"/>
 <link rel="stylesheet" type="text/css" href="/webwork2_files/css/jquery-ui-1.8.18.custom.css"/>
 <link rel="stylesheet" type="text/css" href="/webwork2_files/css/vendor/font-awesome/css/font-awesome.min.css"/>
-<link rel="stylesheet" type="text/css" href="/webwork2_files/themes/math4/math4.css"/>
 <link rel="stylesheet" type="text/css" href="/webwork2_files/css/knowlstyle.css"/>
-
+<!--  css overrides for libretexts -->
+<link rel="stylesheet" type="text/css" href="/webwork2_files/themes/libretexts/libretexts.css"/> 
+<link rel="stylesheet" type="text/css" href="/webwork2_files/themes/libretexts/libretexts-coloring.css"/>
 <!-- JS Loads -->
 <script type="text/javascript" src="/webwork2_files/js/vendor/jquery/jquery.js"></script>
 <script type="text/javascript" src="/webwork2_files/mathjax/MathJax.js?config=TeX-MML-AM_HTMLorMML-full"></script>
@@ -30,20 +41,36 @@ $sticky_format = <<'ENDPROBLEMTEMPLATE';
 <script type="text/javascript" src="/webwork2_files/js/vendor/jquery/modules/jstorage.js"></script>
 <script type="text/javascript" src="/webwork2_files/js/apps/LocalStorage/localstorage.js"></script>
 <script type="text/javascript" src="/webwork2_files/js/apps/Problem/problem.js"></script>
-<script type="text/javascript" src="/webwork2_files/themes/math4/math4.js"></script>	
+<script type="text/javascript" src="/webwork2_files/themes/libretexts/libretexts.js"></script>	
 <script type="text/javascript" src="/webwork2_files/js/vendor/iframe-resizer/js/iframeResizer.contentWindow.min.js"></script>
 $problemHeadText
 
-<title>WeBWorK using host: $SITE_URL, format: sticky seed: $problemSeed</title>
+<title>WeBWorK using host: $SITE_URL, format: libretexts</title>
 </head>
 <body>
 <div class="container-fluid">
 <div class="row-fluid">
-<div class="span12 problem">	
-<hr/>		
+<div class="span12 problem">
+<div class="answerTemplate">		
 $answerTemplate
-<hr/>
-<form id="problemMainForm" class="problem-main-form" name="problemMainForm" action="$FORM_ACTION_URL" method="post">
+</div>
+
+
+<script type="text/javascript">window.addEventListener('load',()=>{
+	if('$JWTanswerTemplate')
+		parent.postMessage( {type: 'answerJWT',JWT:'$JWTanswerTemplate'}, "*",);
+})</script>
+ 
+
+<form id="json_jwt_templates">
+<!-- json: <input type="text"  id="JSONanswerTemplate" 
+	name="JSONanswerTemplate"  value = $JSONanswerTemplate readonly>
+-->
+<input type="hidden"   name = "JWTanswerTemplate" id ="JWTanswerTemplate" 
+	value= $JWTanswerTemplate readonly>
+</form>
+
+<form id="problemMainForm" class="problem-main-form" name="problemMainForm" action="$FORM_ACTION_URL" method="post" style="margin-bottom:-20px">
 <div id="problem_body" class="problem-content" $PROBLEM_LANG_AND_DIR>
 $problemText
 </div>
@@ -56,6 +83,7 @@ $localStorageMessages
 </p>
 
 $LTIGradeMessage
+
 
 <input type="hidden" name="answersSubmitted" value="1"> 
 <input type="hidden" name="sourceFilePath" value = "$sourceFilePath">
@@ -70,10 +98,11 @@ $LTIGradeMessage
 <input type="hidden" name="course_password" value="$course_password">
 <input type="hidden" name="displayMode" value="$displayMode">
 <input type="hidden" name="session_key" value="$session_key">
-<input type="hidden" name="outputformat" value="sticky">
+<input type="hidden" name="outputformat" value="libretexts">
 <input type="hidden" name="language" value="$formLanguage">
 <input type="hidden" name="showSummary" value="$showSummary">
 <input type="hidden" name="forcePortNumber" value="$forcePortNumber">
+
 
 <p>
 <input type="submit" name="preview"  value="$STRING_Preview" />
@@ -84,8 +113,24 @@ $LTIGradeMessage
 </div>
 </div>
 </div>
-<div id="footer">
-WeBWorK &copy; 1996-2019 | host: $SITE_URL | course: $courseID | format: sticky | theme: math4
+
+<!--  script for knowl-like object -->
+<script>
+	$(document).ready(function(){
+		$( ".clickme" ).click(function() {
+		  $( this).next().slideToggle( "slow", function() {
+			// Animation complete.
+		  });
+		});
+
+	   // jQuery methods go here...
+	});
+</script>
+<div class="clickme" id="version">
+<img height="16px" width="16px" src="https://demo.webwork.rochester.edu/webwork2_files/images/webwork_square.svg"/>
+</div>
+<div id="footer" style="display:none">
+WeBWorK &copy; 1996-2020 | host: $SITE_URL | course: $courseID | format: libretexts | theme: math4
 </div>
 
 <!-- Activate local storage js -->
@@ -94,5 +139,7 @@ WeBWorK &copy; 1996-2019 | host: $SITE_URL | course: $courseID | format: sticky 
 </html>
 
 ENDPROBLEMTEMPLATE
-
-$sticky_format;
+# FIXME essentially all of the hidden inputs at the end need to be made secure
+# FIXME what about the session key? that belongs to daemon. can it be switched out
+# by someone else calling the daemon_course? when is the session key renewed?
+$libretexts_format;

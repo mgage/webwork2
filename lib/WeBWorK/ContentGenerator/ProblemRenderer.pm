@@ -22,6 +22,8 @@ use base qw(WeBWorK::ContentGenerator);
 WeBWorK::ContentGenerator::ProblemRenderer - render a problem with a minimal
 amount of UI garbage.
 
+Not used much.  Deprecated. 
+
 =cut
 
 use strict;

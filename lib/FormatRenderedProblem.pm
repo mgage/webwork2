@@ -60,6 +60,10 @@ eval {
 
 our %imagesModeOptions = %{$seed_ce->{pg}->{displayModeOptions}->{images}};
 our $site_url = $seed_ce->{server_root_url}//'';
+
+our $curlCommand = $seed_ce->{externalPrograms}->{curl};
+
+warn "creating image Generator";
 our $imgGen = WeBWorK::PG::ImageGenerator->new(
 		tempDir         => $seed_ce->{webworkDirs}->{tmp},
 		latex	        => $seed_ce->{externalPrograms}->{latex},
@@ -71,7 +75,7 @@ our $imgGen = WeBWorK::PG::ImageGenerator->new(
 		dvipng_align    => $imagesModeOptions{dvipng_align},
 		dvipng_depth_db => $imagesModeOptions{dvipng_depth_db},
 );
-
+warn "image Generator is $imgGen";
 
 sub new {
     my $invocant = shift;
@@ -128,7 +132,7 @@ sub formatRenderedProblem {
 	my $encoded_source     = $self->encoded_source//'';
 	my $sourceFilePath    = $self->{sourceFilePath}//'';
 	my $warnings          = '';
-        my $answerhashXML     = XMLout($rh_answers, RootName => 'answerhashes');
+    my $answerhashXML     = XMLout($rh_answers, RootName => 'answerhashes');
 
 	#################################################
 	# Code to get and set problem language and direction based on flags set by the PG problem.
@@ -268,7 +272,7 @@ sub formatRenderedProblem {
 	
 
 	my $previewMode      =  defined($self->{inputs_ref}->{preview})||0;
-	my $checkMode        =  defined($self->{inputs_ref}->{WWcheck})||0;
+	my $checkMode        =  defined($self->{inputs_ref}->{WWcheck})||0; #not yet used
 	my $submitMode       =  defined($self->{inputs_ref}->{WWsubmit})||0;
 	my $showCorrectMode  =  defined($self->{inputs_ref}->{WWcorrectAns})||0;
 	# problemUUID can be added to the request as a parameter.  
@@ -303,7 +307,9 @@ sub formatRenderedProblem {
 	my $answerTemplate = $tbl->answerTemplate;
 	my $color_input_blanks_script = $tbl->color_answer_blanks;
 	$tbl->imgGen->render(refresh => 1) if $tbl->displayMode eq 'images';
-
+	
+	my $JSONanswerTemplate = $tbl->JSONanswerTemplate;
+	my $JWTanswerTemplate  = $tbl->JWTanswerTemplate;
 	# warn "imgGen is ", $tbl->imgGen;
 	#warn "answerOrder ", $tbl->answerOrder;
 	#warn "answersSubmitted ", $tbl->answersSubmitted;
@@ -430,7 +436,7 @@ EOS
 	$localStorageMessages.= CGI::p('Your overall score for this problem is'.'&nbsp;'.CGI::span({id=>'problem-overall-score'},''));
 	$localStorageMessages .= CGI::end_div();
 		
-	# my $pretty_print_self  = pretty_print($self);
+	#my $pretty_print_self  = pretty_print($self);
 
 	# Enable localized strings for the buttons:
 	my $STRING_Preview     = $mt->maketext("Preview My Answers");
@@ -444,7 +450,7 @@ EOS
 
 	my $format_name = $self->{inputs_ref}->{outputformat}//'standard';
 
-        # The json output format is special and cannot be handled by the
+    # The json output format is special and cannot be handled by the
 	# the standard code
 	if ( $format_name eq "json" ) {
 	  my %output_data_hash;
@@ -477,7 +483,7 @@ EOS
 	  return $json_output_data;
 	}
 
-
+# all other formats except for json_format
 	# find the appropriate template in WebworkClient folder
 	my $template = do("WebworkClient/${format_name}_format.pl");
 	die "Unknown format name $format_name" unless $template;

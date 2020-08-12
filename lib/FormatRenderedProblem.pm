@@ -60,6 +60,9 @@ eval {
 
 our %imagesModeOptions = %{$seed_ce->{pg}->{displayModeOptions}->{images}};
 our $site_url = $seed_ce->{server_root_url}//'';
+
+our $curlCommand = $seed_ce->{externalPrograms}->{curl};
+
 warn "creating image Generator";
 our $imgGen = WeBWorK::PG::ImageGenerator->new(
 		tempDir         => $seed_ce->{webworkDirs}->{tmp},
@@ -129,7 +132,7 @@ sub formatRenderedProblem {
 	my $encoded_source     = $self->encoded_source//'';
 	my $sourceFilePath    = $self->{sourceFilePath}//'';
 	my $warnings          = '';
-        my $answerhashXML     = XMLout($rh_answers, RootName => 'answerhashes');
+    my $answerhashXML     = XMLout($rh_answers, RootName => 'answerhashes');
 
 	#################################################
 	# Code to get and set problem language and direction based on flags set by the PG problem.
@@ -447,7 +450,7 @@ EOS
 
 	my $format_name = $self->{inputs_ref}->{outputformat}//'standard';
 
-        # The json output format is special and cannot be handled by the
+    # The json output format is special and cannot be handled by the
 	# the standard code
 	if ( $format_name eq "json" ) {
 	  my %output_data_hash;
@@ -480,7 +483,7 @@ EOS
 	  return $json_output_data;
 	}
 
-
+# all other formats except for json_format
 	# find the appropriate template in WebworkClient folder
 	my $template = do("WebworkClient/${format_name}_format.pl");
 	die "Unknown format name $format_name" unless $template;

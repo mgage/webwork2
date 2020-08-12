@@ -190,16 +190,16 @@ sub pre_header_initialize {
 
 		#override input_hash if keys are present
 		# override protected input_hash values from the payload 
-		for my $key (qw(userID courseID displayMode
+		for my $key (qw(userID courseID 
 		                course_password answersSubmitted problemSeed problemUUID sourceFilePath 
 		                outputformat)
 		            ) {
-					$input_hash{$key} = $payload->{$key} if defined ($payload->{$key});
+					$input_hash{$key} = $payload->{$key} if  ($payload->{$key});
 					# use defined to allow zero values in payload to override input_hash
 		}
 		 
 		# sanity check
-		my $debug=0;
+		my $debug=1;
 		if ($debug){ 
 			#unit test of passing in variables
 			#There is a bug here when trying to do sourceFilePath or displayMode????
@@ -207,25 +207,28 @@ sub pre_header_initialize {
 			print CGI::ul( 
 				  CGI::h1("JWT is present"),
 				  CGI::li(CGI::escapeHTML([
-					"decoded webworkJWT: |$webworkJWT|",
+					"webworkJWT: |$webworkJWT|",
 					"userID: |$input_hash{userID}|",
 					"courseID: |$input_hash{courseID}|",
 					"sourceFilePath: |$input_hash{sourceFilePath}|",
 					"displayMode: |$input_hash{displayMode}|",
-					"problemSeed: |$input_hash{problemSeed}|"
+					"problemSeed: |$input_hash{problemSeed}|",
+					"jwt_payload: |",encode_json($input_hash{jwt_payload}),"|",
 				  ])
 				  )
 			);
 			#print (" | ", encode_json($payload), "<br/>");
-			my $envir = $payload->{envir};
-			if ($envir){
-				print "envir: ", encode_json( $envir), "<br/>";
-			}
+			#my $envir = $payload->{envir};
+			#if ($envir){
+			#	print "envir: |", encode_json( $envir), "|<br/>";
+			#}
 		}
+		# emergency hacks   FIXME
+	
+	} # end jwt special case
 
-
-	}
-
+	$input_hash{envir}->{displayMode} = $input_hash{displayMode};
+	$input_hash{envir}->{problemSeed} = $input_hash{problemSeed};
 	
 	unless ( $user_id && $courseName && $displayMode && $problemSeed) {
 		#sanity check for required variables

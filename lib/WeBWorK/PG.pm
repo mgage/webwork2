@@ -293,11 +293,13 @@ sub defineProblemEnvir {
 	for my $SPGEV (keys %{$specialPGEnvironmentVarHash}) {
 		$envir{$SPGEV} = $specialPGEnvironmentVarHash->{$SPGEV};
 	}
-	my $payload = $envir{inputs_ref}->{jwt_payload}//{};
+
+	my $payload = $envir{input_hash}->{jwt_payload}//{};
+	#update pg envir variable from the JWT payload
 	my $payload_envir = $payload->{envir};
 	if($payload_envir){
 		foreach my $key (keys %$payload_envir) {
-			$envir{$key}= $payload_envir->{$key};
+			$envir{$key}= $payload_envir->{$key} if defined ($payload_envir->{key});
 		}
 	}
 	return \%envir;

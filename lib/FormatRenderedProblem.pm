@@ -60,9 +60,6 @@ eval {
 
 our %imagesModeOptions = %{$seed_ce->{pg}->{displayModeOptions}->{images}};
 our $site_url = $seed_ce->{server_root_url}//'';
-
-our $curlCommand = $seed_ce->{externalPrograms}->{curl};
-
 warn "creating image Generator";
 our $imgGen = WeBWorK::PG::ImageGenerator->new(
 		tempDir         => $seed_ce->{webworkDirs}->{tmp},

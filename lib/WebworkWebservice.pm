@@ -52,7 +52,7 @@ use warnings;
 use WeBWorK::Localize;
 
 
-our  $UNIT_TESTS_ON    = 0;
+our  $UNIT_TESTS_ON    = 1;
 
 # error formatting
 
@@ -230,6 +230,8 @@ sub initiate_session {    # close to being a "new" subroutine
 ###########################################################################
  
 if ($UNIT_TESTS_ON) {
+	print STDERR "args[0]", $args[0];
+	print STDERR  encode_json($rh_input);
 	print STDERR  "WebworkWebservice.pl ".__LINE__." site_password  is " , $rh_input->{site_password},"\n";
 	print STDERR  "WebworkWebservice.pl ".__LINE__." course_password  is " , $rh_input->{course_password},"\n";
 	print STDERR  "WebworkWebservice.pl ".__LINE__." courseID  is " , $rh_input->{courseID},"\n";

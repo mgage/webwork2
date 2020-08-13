@@ -171,7 +171,7 @@ sub pre_header_initialize {
 
 	#dereference these variables for error reporting in the next two conditional statements 
 	my $user_id      = $input_hash{userID};
-	my $courseName   = $input_hash{courseID};
+	my $courseID   = $input_hash{courseID};
 	my $displayMode  = $input_hash{displayMode};
 	my $problemSeed  = $input_hash{problemSeed};
 
@@ -210,6 +210,7 @@ sub pre_header_initialize {
 					"webworkJWT: |$webworkJWT|",
 					"userID: |$input_hash{userID}|",
 					"courseID: |$input_hash{courseID}|",
+					"course_password: |$input_hash{course_password}|",
 					"sourceFilePath: |$input_hash{sourceFilePath}|",
 					"displayMode: |$input_hash{displayMode}|",
 					"problemSeed: |$input_hash{problemSeed}|",
@@ -230,16 +231,15 @@ sub pre_header_initialize {
 	$input_hash{envir}->{displayMode} = $input_hash{displayMode};
 	$input_hash{envir}->{problemSeed} = $input_hash{problemSeed};
 	
-	unless ( $user_id && $courseName && $displayMode && $problemSeed) {
+	unless ( $user_id && $courseID && $displayMode && $problemSeed) {
 		#sanity check for required variables
 		print CGI::ul( 
 		      CGI::h1("Missing essential data in web dataform:"),
 			  CGI::li(CGI::escapeHTML([
 		      	"userID: |$user_id|", 
-		      	"courseID: |$courseName|",	
+		      	"courseID: |$courseID|",	
 		        "displayMode: |$displayMode|", 
 		        "problemSeed: |$problemSeed|",
-		        "webworkJWT: |$webworkJWT|",
 		      ])));
 		return;
 	}
@@ -264,8 +264,8 @@ sub pre_header_initialize {
 	                                             # from files stored on the WebworkWebservice server (e.g. OPL) 
 	# $xmlrpc_client->{webworkJWT}     = $input_hash{webworkJWT}//''; can be obtained from input_hash
 	# in addition to the arguments above the input_hash contains parameters for the pg_environment
-	$xmlrpc_client->{input_hash}      = \%input_hash;  # contains GET parameters from form
-
+	$xmlrpc_client->{inputs_ref}      = \%input_hash;  # contains GET parameters from form
+    #FIXME need new name for inputs_ref
 
 	##############################
 	# xmlrpc_client calls webservice via
@@ -274,7 +274,7 @@ sub pre_header_initialize {
 	# from which it will eventually be returned to the browser
 	#
 	##############################
-	if ( $xmlrpc_client->xmlrpcCall('renderProblem', $xmlrpc_client->{input_hash}) )    {
+	if ( $xmlrpc_client->xmlrpcCall('renderProblem', \%input_hash) )    {
 			$self->{output} = $xmlrpc_client->formatRenderedProblem ;
 	} else {
 		$self->{output}= $xmlrpc_client->return_object;  # error report

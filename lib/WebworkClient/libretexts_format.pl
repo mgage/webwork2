@@ -1,13 +1,3 @@
-
-
-
-
-warn qq{--$curlCommand --request POST -H 'Accept: application/json' -H 
-"Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNTk2NjM0OTkyLCJleHAiOjE1OTY3MjEzOTIsIm5iZiI6MTU5NjYzNDk5MiwianRpIjoiTWQybzUxOEg1UHNMUlR3aiIsInN1YiI6MSwicHJ2IjoiODdlMGFmMWVmOWZkMTU4MTJmZGVjOTcxNTNhMTRlMGIwNDc1NDZhYSIsInVzZXJfaWQiOjEsIndlYndvcmsiOiJibGFoIGJsYWggYmxhaCBzdHVmZiJ9.aazV1oZ1L0kxoGY6Hx1seCXR_CaCKnzBH0Yl_iawJGs" 
-https://dev.adapt.libretexts.org/api/jwt-test
-}
-
-
 $libretexts_format = <<'ENDPROBLEMTEMPLATE';
 
 <!DOCTYPE html>

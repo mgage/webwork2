@@ -129,7 +129,7 @@ use constant  TRANSPORT_METHOD => 'XMLRPC::Lite';
 use constant  REQUEST_CLASS    => 'WebworkXMLRPC';  # WebworkXMLRPC is used for soap also!!
 use constant  REQUEST_URI      => 'mod_xmlrpc';
 
-our $UNIT_TESTS_ON             = 0;
+our $UNIT_TESTS_ON             = 1;
 
 ##################
 # static variables
@@ -258,11 +258,12 @@ sub xmlrpcCall {
 	my $self = shift;
 	my $command = shift;
 	my $input   = shift||{};
+	warn "input into xmlrpcCall", encode_json($input);
 	my $requestObject;
 	$command   = 'listLibraries' unless defined $command;
 	my $default_inputs = $self->default_inputs();
-	$requestObject = {%$default_inputs, %$input};  #input values can override default inputs
-	  
+	$requestObject = {(%$default_inputs, %$input)};  #input values can override default inputs
+	warn "requestObject", encode_json($requestObject);
 	$self->request_object($requestObject);   # store the request object for later
 	
 	my $requestResult; 
@@ -292,7 +293,7 @@ sub xmlrpcCall {
         print STDERR  "\n\tWebworkClient.pm ".__LINE__." xmlrpcCall sent to site ", $self->site_url,"\n";
         print STDERR  "\tWebworkClient.pm ".__LINE__." full xmlrpcCall path ", ($self->site_url).'/'.REQUEST_URI,"\n";
     	print STDERR  "\tWebworkClient.pm ".__LINE__." xmlrpcCall issued with command $command\n";
-    	print STDERR  "\tWebworkClient.pm ".__LINE__." input is: ",join(" ", map {$_//'--'} %{$self->request_object}),"\n";
+    	print STDERR  "\tWebworkClient.pm ".__LINE__.( encode_json($self->request_object)),"\n";
     	print STDERR  "\tWebworkClient.pm ".__LINE__." xmlrpcCall $command initiated webwork webservice object $requestResult\n";
     }
  		
@@ -594,9 +595,8 @@ sub default_inputs {
 		library_name =>  'Library',
 		command      =>  'renderProblem',
 		answer_form_submitted   => 1,
-		course                  => $self->{course},
+		courseID                => $self->{courseID},
 		extra_packages_to_load  => [@extra_packages_to_load],
-		mode                    => $self->{displayMode},
 		displayMode             => $self->{displayMode},
 		modules_to_evaluate     => [@modules_to_evaluate],
 		envir                   => $self->environment(),
@@ -812,7 +812,8 @@ sub pretty_print {    # provides html output -- NOT a method
 sub format_hash_ref {
 	my $hash = shift;
 	warn "Use a hash reference" unless ref($hash) =~/HASH/;
-	return join(" ", map {$_="--" unless defined($_);$_ } %$hash),"\n";
+	#return join(" ", map {$_="--" unless defined($_);$_ } %$hash),"\n";
+	return encode_json($hash);
 }
 
 =back

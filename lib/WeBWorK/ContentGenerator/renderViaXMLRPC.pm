@@ -139,6 +139,7 @@ sub pre_header_initialize {
 	my $r = $self->r;
 	# Note: Vars helps handle things like checkbox 'packed' data;
 	my %input_hash =  WeBWorK::Form->new_from_paramable($r)->Vars ;
+	warn "\n renderViaXMLRPC.pm ".__LINE__."input_hash ".encode_json(\%input_hash);
     # input_hash contains the GET parameters(and possibly POST parameters) from the call to html2xml
      
 	# these parameters are required to set up the PG_renderer
@@ -190,7 +191,7 @@ sub pre_header_initialize {
 
 		#override input_hash if keys are present
 		# override protected input_hash values from the payload 
-		for my $key (qw(userID courseID 
+		for my $key (qw(userID courseID displayMode problemSeed
 		                course_password answersSubmitted problemSeed problemUUID sourceFilePath 
 		                outputformat)
 		            ) {
@@ -228,8 +229,9 @@ sub pre_header_initialize {
 	
 	} # end jwt special case
 
-	$input_hash{envir}->{displayMode} = $input_hash{displayMode};
-	$input_hash{envir}->{problemSeed} = $input_hash{problemSeed};
+    # I believe this was erasing the default envir defined in webworkClient/webworkWebservice
+	#$input_hash{envir}->{displayMode} = $input_hash{displayMode};
+	#$input_hash{envir}->{problemSeed} = $input_hash{problemSeed};
 	
 	unless ( $user_id && $courseID && $displayMode && $problemSeed) {
 		#sanity check for required variables

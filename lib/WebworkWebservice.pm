@@ -52,7 +52,7 @@ use warnings;
 use WeBWorK::Localize;
 
 
-our  $UNIT_TESTS_ON    = 1;
+our  $UNIT_TESTS_ON    = 0;
 
 # error formatting
 
@@ -230,8 +230,7 @@ sub initiate_session {    # close to being a "new" subroutine
 ###########################################################################
  
 if ($UNIT_TESTS_ON) {
-	print STDERR "args[0]", $args[0];
-	print STDERR  encode_json($rh_input);
+	print STDERR  "\nWebworkWebservice.pl ".__LINE__." initiate_session::rh_input", encode_json($rh_input);
 	print STDERR  "WebworkWebservice.pl ".__LINE__." site_password  is " , $rh_input->{site_password},"\n";
 	print STDERR  "WebworkWebservice.pl ".__LINE__." course_password  is " , $rh_input->{course_password},"\n";
 	print STDERR  "WebworkWebservice.pl ".__LINE__." courseID  is " , $rh_input->{courseID},"\n";
@@ -327,7 +326,7 @@ my $authz  = $fake_r->authz;
   		print STDERR  "WebworkWebservice.pm ".__LINE__." authentication for ",$self->{user_id}, " in course ", $self->{courseName}, " is = ", $self->{authenOK},"\n";
       	print STDERR  "WebworkWebservice.pm ".__LINE__."authorization as instructor for ", $self->{user_id}, " is ", $self->{authzOK},"\n"; 
   		print STDERR  "WebworkWebservice.pm ".__LINE__." authentication contains ", format_hash_ref($authen),"\n";
-  		print STDERR   "self has new data \n", format_hash_ref($self), "\n";
+  		print STDERR  "WebworkWebservice.pm ".__LINE__. "webworkXMLRPC object has new authen data \n", format_hash_ref($self), "\n";
   	} 
  # Is there a way to transmit a number as well as a message?
  # Could be useful for handling errors.
@@ -598,7 +597,7 @@ sub renderProblem {
     my $class = shift;
     my $in = shift;
     my $self = $class->initiate_session($in);
-
+    warn "\n\nWebworkWebservice".__LINE__."renderProblem input ",encode_json($in),"\n";
     return $self->do( WebworkWebservice::RenderProblem::renderProblem($self,$in) ); 
 }
 

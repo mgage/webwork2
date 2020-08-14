@@ -94,7 +94,7 @@ sub new_helper {
 		                     # translator, such as whether to show
 		                     # hints and the display mode to use
 	) = @_;
-	
+	warn "\n\nproblem $problem\n","psvn $psvn\n", "formFields $formFields\n";
 	# write timing log entry
 # 	writeTimingLogEntry($ce, "WeBWorK::PG::new",
 # 		"user=".$user->user_id.",problem=".$ce->{courseName}."/".$set->set_id."/".$problem->problem_id.",mode=".$translationOptions->{displayMode},

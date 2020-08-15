@@ -305,11 +305,13 @@ sub formatRenderedProblem {
 
 
 	my $answerTemplate = $tbl->answerTemplate;
+	my $JSONanswerTemplate = $tbl->JSONanswerTemplate;
+	my $JWTanswerTemplate  = $tbl->JWTanswerTemplate;	
+
 	my $color_input_blanks_script = $tbl->color_answer_blanks;
 	$tbl->imgGen->render(refresh => 1) if $tbl->displayMode eq 'images';
 	
-	my $JSONanswerTemplate = $tbl->JSONanswerTemplate;
-	my $JWTanswerTemplate  = $tbl->JWTanswerTemplate;
+
 	# warn "imgGen is ", $tbl->imgGen;
 	#warn "answerOrder ", $tbl->answerOrder;
 	#warn "answersSubmitted ", $tbl->answersSubmitted;
@@ -482,11 +484,19 @@ EOS
 	  # FIXME: Should set header of response to content_type("text/json; charset=utf-8");
 	  return $json_output_data;
 	}
+	
+	# The libretexts format also requires special preparation
+
 
 # all other formats except for json_format
 	# find the appropriate template in WebworkClient folder
 	my $template = do("WebworkClient/${format_name}_format.pl");
-	die "Unknown format name $format_name" unless $template;
+	unless ($template) {
+            warn "couldn't parse ${format_name}_format.pl: $@" if $@;
+            warn "couldn't do ${format_name}_format.pl: $!"    unless defined $template;
+            warn "couldn't run ${format_name}_format.pl"       unless $template;
+    }
+	die "Perhaps an unknown format name $format_name" unless $template;
 	# interpolate values into template
 	$template =~ s/(\$\w+)/$1/gee;  
 	return $template;

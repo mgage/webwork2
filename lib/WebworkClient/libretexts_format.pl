@@ -1,20 +1,21 @@
+# put a command here?
 
+# don't use my here?
+$adapt_call_return= eval{
+			$ADAPTcall = qq{/usr/bin/curl -s --request POST -H 'Accept: application/json' -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC8xMjcuMC4wLjE6ODAwMFwvYXBpXC9sb2dpbiIsImlhdCI6MTU5NzQzNzQ3OCwiZXhwIjoxNTk3NTIzODc4LCJuYmYiOjE1OTc0Mzc0NzgsImp0aSI6InRyS3NITTR2emhtZVNwaG8iLCJzdWIiOjEzLCJwcnYiOiI4N2UwYWYxZWY5ZmQxNTgxMmZkZWM5NzE1M2ExNGUwYjA0NzU0NmFhIn0.ZOLMvwuNBY4RmQR_eiHIL7MtFUvLSKS9X9Z9HrwvDBw" https://dev.adapt.libretexts.org/api/jwt-test
+						};
+ 			`$ADAPTcall`;
+ 		};
+		if ($@) {warn "problem with curl call $@"};
+ 		$adapt_call_return = "return from adapt call: ".$adapt_call_return;
 
-
-
-warn qq{--$curlCommand --request POST -H 'Accept: application/json' -H 
-"Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNTk2NjM0OTkyLCJleHAiOjE1OTY3MjEzOTIsIm5iZiI6MTU5NjYzNDk5MiwianRpIjoiTWQybzUxOEg1UHNMUlR3aiIsInN1YiI6MSwicHJ2IjoiODdlMGFmMWVmOWZkMTU4MTJmZGVjOTcxNTNhMTRlMGIwNDc1NDZhYSIsInVzZXJfaWQiOjEsIndlYndvcmsiOiJibGFoIGJsYWggYmxhaCBzdHVmZiJ9.aazV1oZ1L0kxoGY6Hx1seCXR_CaCKnzBH0Yl_iawJGs" 
-https://dev.adapt.libretexts.org/api/jwt-test
-}
-
-
-$libretexts_format = <<'ENDPROBLEMTEMPLATE';
+my $libretexts_format = <<'ENDPROBLEMTEMPLATE';
 
 <!DOCTYPE html>
 <html $COURSE_LANG_AND_DIR>
 <head>
 <meta charset='utf-8'>
-<base href="$SITE_URL">
+<base href="$SITE_URL"> 
 <link rel="shortcut icon" href="/webwork2_files/images/favicon.ico"/>
 
 <!-- CSS Loads -->
@@ -46,29 +47,29 @@ $libretexts_format = <<'ENDPROBLEMTEMPLATE';
 $problemHeadText
 
 <title>WeBWorK using host: $SITE_URL, format: libretexts</title>
+
 </head>
 <body>
 <div class="container-fluid">
 <div class="row-fluid">
 <div class="span12 problem">
+<div>
+	<h3> Curl call </h3>
+	<p>
+	$adapt_call_return 
+	</p>
+
+	<p>
+	answer jwt: $JWTanswerTemplate
+	</p>
+</div>
+
+
 <div class="answerTemplate">		
 $answerTemplate
 </div>
 
 
-<script type="text/javascript">window.addEventListener('load',()=>{
-	if('$JWTanswerTemplate')
-		parent.postMessage( {type: 'answerJWT',JWT:'$JWTanswerTemplate'}, "*",);
-})</script>
- 
-
-<form id="json_jwt_templates">
-<!-- json: <input type="text"  id="JSONanswerTemplate" 
-	name="JSONanswerTemplate"  value = $JSONanswerTemplate readonly>
--->
-<input type="hidden"   name = "JWTanswerTemplate" id ="JWTanswerTemplate" 
-	value= $JWTanswerTemplate readonly>
-</form>
 
 <form id="problemMainForm" class="problem-main-form" name="problemMainForm" action="$FORM_ACTION_URL" method="post" style="margin-bottom:-20px">
 <div id="problem_body" class="problem-content" $PROBLEM_LANG_AND_DIR>
@@ -139,7 +140,5 @@ WeBWorK &copy; 1996-2020 | host: $SITE_URL | course: $courseID | format: librete
 </html>
 
 ENDPROBLEMTEMPLATE
-# FIXME essentially all of the hidden inputs at the end need to be made secure
-# FIXME what about the session key? that belongs to daemon. can it be switched out
-# by someone else calling the daemon_course? when is the session key renewed?
+
 $libretexts_format;

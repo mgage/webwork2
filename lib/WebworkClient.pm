@@ -129,7 +129,7 @@ use constant  TRANSPORT_METHOD => 'XMLRPC::Lite';
 use constant  REQUEST_CLASS    => 'WebworkXMLRPC';  # WebworkXMLRPC is used for soap also!!
 use constant  REQUEST_URI      => 'mod_xmlrpc';
 
-our $UNIT_TESTS_ON             = 0;
+our $UNIT_TESTS_ON             = 1;
 
 ##################
 # static variables
@@ -282,8 +282,9 @@ sub xmlrpcCall {
 		-> proxy(($site_url).'/'.REQUEST_URI);
 	};
 	# END of FIXME section
-	
-	print STDERR "WebworkClient: Initiating xmlrpc request to url ",($self->site_url).'/'.REQUEST_URI, " \n Error: $@\n" if $@;
+	if ($@){
+		print STDERR "\nWebworkClient.pm ".__LINE__.": Failure: Attempted xmlrpc request to url ",($self->site_url).'/'.REQUEST_URI, " \n Error: $@\n"
+	} 
 	# turn off verification of the ssl cert 
 	$transporter->transport->ssl_opts(verify_hostname=>0,
 	    SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_NONE);
@@ -293,16 +294,15 @@ sub xmlrpcCall {
         print STDERR  "\tWebworkClient.pm ".__LINE__." full xmlrpcCall path ", ($self->site_url).'/'.REQUEST_URI,"\n";
     	print STDERR  "\tWebworkClient.pm ".__LINE__." xmlrpcCall issued with command $command\n";
     	print STDERR  "\tWebworkClient.pm ".__LINE__." input is: ",join(" ", map {$_//'--'} %{$self->request_object}),"\n";
-    	print STDERR  "\tWebworkClient.pm ".__LINE__." xmlrpcCall $command initiated webwork webservice object $requestResult\n";
+    	print STDERR  "\tWebworkClient.pm ".__LINE__." xmlrpcCall $command initiated webwork webservice object. Object returned: $requestResult\n";
     }
  		
 	local( $result);
-	# use eval to catch errors
-	#print STDERR "WebworkClient: issue command ", REQUEST_CLASS.'.'.$command, " ",join(" ", %$input),"\n";
 	eval { $result = $requestResult->call(REQUEST_CLASS.'.'.$command, $self->request_object ) };
 	# result is of type XMLRPC::SOM
 	if ( $@ ) {
 		print STDERR (
+		    "result returned from request was $result",
 			"There were a lot of errors\n",
 			"Errors: \n $@\n End Errors\n" );
 		print CGI::h2("WebworkClient Errors");

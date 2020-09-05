@@ -34,6 +34,8 @@ use XML::Simple qw(XMLout);
 use WeBWorK::Utils::DetermineProblemLangAndDirection;
 use Encode qw(encode_utf8 decode_utf8);
 use JSON;
+use Crypt::JWT;
+use LWP::Curl;
 
 our $UNIT_TESTS_ON  = 0; 
 

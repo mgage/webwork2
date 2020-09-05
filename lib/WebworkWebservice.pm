@@ -52,7 +52,7 @@ use warnings;
 use WeBWorK::Localize;
 
 
-our  $UNIT_TESTS_ON    = 0;
+our  $UNIT_TESTS_ON    = 1;
 
 # error formatting
 
@@ -214,7 +214,6 @@ use JSON;
 ###########################################################################
 #  authentication and authorization
 ###########################################################################
-
 sub initiate_session {    # close to being a "new" subroutine
 	my ($invocant, @args) = @_;
 	my $class = ref $invocant || $invocant;
@@ -1001,13 +1000,14 @@ sub format_hash_ref {
 # -- SOAP::Lite -- guide.soaplite.com -- Copyright (C) 2001 Paul Kulchenko --
 # test responses
 
-# sub hi {   shift if UNIVERSAL::isa($_[0] => __PACKAGE__); # grabs class reference                 
-#   return "hello, world";     
-# }
-# sub hello2 { shift if UNIVERSAL::isa($_[0] => __PACKAGE__);
-# 	#print "Receiving request for hello world\n";
-# 	return "Hello world2";
-# }
+ sub hi {   shift if UNIVERSAL::isa($_[0] => __PACKAGE__); # grabs class reference  
+    print STDERR "you have reached hi in docker2";              
+  return "hello, world from inside webwork-docker2";     
+ }
+ sub hello2 { shift if UNIVERSAL::isa($_[0] => __PACKAGE__);
+ 	#print "Receiving request for hello world\n";
+ 	return "Hello world2";
+ }
 # sub bye {shift if UNIVERSAL::isa($_[0] => __PACKAGE__);  
 # 	return "goodbye, sad cruel world";
 # }

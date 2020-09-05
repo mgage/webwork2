@@ -49,8 +49,14 @@ dpkg-reconfigure -f noninteractive libpaper1
 
 # Install some extra packages
 if [ "$ADD_APT_PACKAGES" != "0" ]; then
+  echo "add $ADD_APT_PACKAGES"
   apt-get update
   apt-get install -y --no-install-recommends --no-install-suggests $ADD_APT_PACKAGES
+fi
+
+if [ "$ADD_CPAN_PACKAGES" != "0" ]; then
+  echo "add $ADD_CPAN_PACKAGES"
+  cpanm $ADD_CPAN_PACKAGES
 fi
 
 # If necessary, clone the OPL in the running container, hopefully in persistent storage

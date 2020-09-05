@@ -220,12 +220,16 @@ RUN apt-get update \
 	lmodern \
 	zip \
 	jq \
+	vim \
+	less \
+	libcurl4-openssl-dev\
     && apt-get clean \
     && rm -fr /var/lib/apt/lists/* /tmp/*
 
 # Developers may want to add additional packages inside the image
 # such as: telnet vimvim mc file
 
+	
 # ==================================================================
 
 # Phase 4 - Install webwork2, pg, MathJaX which were downloaded to /opt/base/ in phase 1
@@ -273,6 +277,9 @@ RUN echo "PATH=$PATH:$APP_ROOT/webwork2/bin" >> /root/.bashrc \
 # Phase 6 - install additional Perl modules from CPAN (not packaged for Ubuntu or outdated in Ubuntu)
 
 RUN cpanm install Statistics::R::IO \
+    Crypt::JWT \
+    HTTP::Async \
+    LWP::Curl \
     && rm -fr ./cpanm /root/.cpanm /tmp/*
 
 # Now installed from Ubuntu packages:
@@ -343,7 +350,8 @@ ENV SSL=0 \
     PAPERSIZE=letter \
     SYSTEM_TIMEZONE=UTC \
     ADD_LOCALES=0 \
-    ADD_APT_PACKAGES=0
+    ADD_APT_PACKAGES="0" \
+    ADD_CPAN_PACKAGES="0"
 
 # ================================================
 

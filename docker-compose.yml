@@ -13,7 +13,7 @@ services:
       # When the MariaDB container is first started it will set the
       # the MYSQL_ROOT_PASSWORD if there is no mysql database in the
       # data volume.
-      MYSQL_ROOT_PASSWORD: sqlRootPasswordSetThisPasswordBEFOREfirstStartingTheDBcontainer
+      MYSQL_ROOT_PASSWORD: mikegage
 
       # When the MariaDB container is first started it will create
       #    the WW database and WW DB user based on:
@@ -49,7 +49,7 @@ services:
 
       # If you are using locally modified webwork2 files, then
       # either mount them from the webwork2 tree from which you start Docker:
-      #- ".:/opt/webwork/webwork2"
+      bb- ".:/opt/webwork/webwork2"
       # OR mount it from a fixed external location
       #- "/path_to/webwork2:/opt/webwork/webwork2"
 

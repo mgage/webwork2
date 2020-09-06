@@ -243,7 +243,7 @@ sub formatRenderedProblem {
 
 
 	$self->{outputformats}={};
-	my $SITE_URL      	 =  $self->site_url//'';
+	my $SITE_URL      	 =  $seedce->{server_root_url }; #$self->site_url//'';
 	my $FORM_ACTION_URL  =  $self->{form_action_url}//'';
 
 	#################################################

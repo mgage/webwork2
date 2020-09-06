@@ -110,15 +110,15 @@ unless ($server_root_url) {
 # child
 ############################
 
-our ($SITE_URL, $FORM_ACTION_URL, $XML_PASSWORD, $XML_COURSE);
+our ($WEBSERVICE_SITE_URL, $FORM_ACTION_URL, $XML_PASSWORD, $XML_COURSE);
 
 	$XML_PASSWORD     	 =  'xmluser';
 	$XML_COURSE          =  'daemon_course';
 
 
 
-	$SITE_URL            =  "$server_root_url" ; 
-	$FORM_ACTION_URL     =  "$server_root_url/webwork2/instructorXMLHandler";
+	$WEBSERVICE_SITE_URL            =  "http://localhost"; # "$server_root_url" ;  # internal without 8080
+	$FORM_ACTION_URL     =  "$server_root_url/webwork2/instructorXMLHandler"; #external with 8080
 
 use constant DISPLAYMODE   => 'images'; #  Mathjax  is another possibilities.
 
@@ -163,7 +163,7 @@ sub pre_header_initialize {
     #######################
     my $xmlrpc_client = new WebworkClient;
 
-	$xmlrpc_client->site_url($SITE_URL);  # does NOT include mod_xmlrpc ending
+	$xmlrpc_client->webservice_site_url($WEBSERVICE_SITE_URL);  # does NOT include mod_xmlrpc ending
 #	$xmlrpc_client->{site_url} ='';   # make this the site without the mod_xmlrpc ending? ~= s/mod_xmlrpc$
 	$xmlrpc_client->{form_action_url}= $FORM_ACTION_URL;
 	$xmlrpc_client->{user}          = 'xmluser';

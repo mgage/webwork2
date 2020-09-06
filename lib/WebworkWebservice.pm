@@ -52,7 +52,7 @@ use warnings;
 use WeBWorK::Localize;
 
 
-our  $UNIT_TESTS_ON    = 1;
+our  $UNIT_TESTS_ON    = 0;
 
 # error formatting
 

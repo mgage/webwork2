@@ -58,7 +58,7 @@ use Crypt::JWT qw( decode_jwt encode_jwt);
 # 1.  The url  http://test.webwork.maa.org/mod_xmlrpc
 #    points to the Webservice.pm and Webservice/RenderProblem modules
 #    Is used by the client to send the original XML request to the webservice.
-#    It is constructed in WebworkClient::xmlrpcCall() from the value of $webworkClient->site_url which does 
+#    It is constructed in WebworkClient::xmlrpcCall() from the value of $webworkclient->webservice_site_url which does 
 #    NOT have the mod_xmlrpc segment (it should be   http://test.webwork.maa.org) 
 #    and the constant  REQUEST_URI defined in WebworkClient.pm to be mod_xmlrpc.  
 #
@@ -115,15 +115,15 @@ unless ($server_root_url) {
 # child
 ############################
 
-our ($SITE_URL,$FORM_ACTION_URL, $XML_PASSWORD, $XML_COURSE);
+our ($WEBSERVICE_SITE_URL,$FORM_ACTION_URL, $XML_PASSWORD, $XML_COURSE);
 
 	$XML_PASSWORD     	 =  'xmlwebwork';
 	$XML_COURSE          =  'daemon_course';
 
 
 
-	$SITE_URL             =  "$server_root_url"; 
-	$FORM_ACTION_URL     =  "$server_root_url/webwork2/html2xml";
+	$WEBSERVICE_SITE_URL =  "http://localhost"; #"$server_root_url"; #includes port (which is :80 within the container)
+	$FORM_ACTION_URL     =  "http://localhost:8080/webwork2/html2xml"; #includes exterior port provided by the container
 
 
 our @COMMANDS = qw( listLibraries    renderProblem  ); #listLib  readFile tex2pdf 
@@ -248,7 +248,7 @@ sub pre_header_initialize {
 	# these are toplevel items in the WebworkClient object
 	$xmlrpc_client->encoded_source($r->param('problemSource')) ; 
 	     # this source, if it exists, has already been encoded in base64.
-	$xmlrpc_client->site_url($SITE_URL);  # the url of the WebworkWebservice
+	$xmlrpc_client->webservice_site_url($WEBSERVICE_SITE_URL);  # the url of the WebworkWebservice
 	$xmlrpc_client->{form_action_url} = $FORM_ACTION_URL;  # the action to placed in the return HTML form
 	$xmlrpc_client->{userID}          = $hash_from_web_form{userID};
 	$xmlrpc_client->{courseID}        = $hash_from_web_form{courseID};

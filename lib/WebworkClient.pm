@@ -62,7 +62,7 @@ use warnings;
 
 # To configure the target webwork server
 # two URLs are required
-# 1. $SITE_URL   http://test.webwork.maa.org/mod_xmlrpc
+# 1. $WEBSERVICE_SITE_URL =  http://test.webwork.maa.org/mod_xmlrpc
 #    points to the Webservice.pm and Webservice/RenderProblem modules
 #    Is used by the client to send the original XML request to the webservice
 #    Note: This is not the same as the webworkClient->url which should NOT have
@@ -129,7 +129,7 @@ use constant  TRANSPORT_METHOD => 'XMLRPC::Lite';
 use constant  REQUEST_CLASS    => 'WebworkXMLRPC';  # WebworkXMLRPC is used for soap also!!
 use constant  REQUEST_URI      => 'mod_xmlrpc';
 
-our $UNIT_TESTS_ON             = 1;
+our $UNIT_TESTS_ON             = 0;
 
 ##################
 # static variables
@@ -268,30 +268,30 @@ sub xmlrpcCall {
 	my $requestResult; 
 	my $transporter = TRANSPORT_METHOD->new;
     #FIXME -- transitional error fix to remove mod_xmlrpc from end of url call
-    my $site_url = $self->site_url;
-    if ($site_url =~ /mod_xmlrpc$/ ){
-    	$site_url =~ s|/mod_xmlrpc/?||; # mod_xmlrpc from  https://my.site.edu/mod_xmlrpc
-    	$self->site_url($site_url);
+    my $webservice_site_url = $self->webservice_site_url;
+    if ($webservice_site_url =~ /mod_xmlrpc$/ ){
+    	$webservice_site_url =~ s|/mod_xmlrpc/?||; # mod_xmlrpc from  https://my.site.edu/mod_xmlrpc
+    	$self->webservice_site_url($webservice_site_url);
     	# complain
-    	print STDERR "\n\n\$self->site_url() should not end in /mod_xmlrpc \n\n";
+    	print STDERR "\n\n\$self->webservice_site_url() should not end in /mod_xmlrpc \n\n";
     }
 	eval {
 	    $requestResult= $transporter
 	        #->uri('http://'.HOSTURL.':'.HOSTPORT.'/'.REQUEST_CLASS)
 		#-> proxy(PROTOCOL.'://'.HOSTURL.':'.HOSTPORT.'/'.REQUEST_URI);
-		-> proxy(($site_url).'/'.REQUEST_URI);
+		-> proxy(($webservice_site_url).'/'.REQUEST_URI);
 	};
 	# END of FIXME section
 	if ($@){
-		print STDERR "\nWebworkClient.pm ".__LINE__.": Failure: Attempted xmlrpc request to url ",($self->site_url).'/'.REQUEST_URI, " \n Error: $@\n"
+		print STDERR "\nWebworkClient.pm ".__LINE__.": Failure: Attempted xmlrpc request to url ",($self->webservice_site_url).'/'.REQUEST_URI, " \n Error: $@\n"
 	} 
 	# turn off verification of the ssl cert 
 	$transporter->transport->ssl_opts(verify_hostname=>0,
 	    SSL_verify_mode => IO::Socket::SSL::SSL_VERIFY_NONE);
 			
     if ($UNIT_TESTS_ON) {
-        print STDERR  "\n\tWebworkClient.pm ".__LINE__." xmlrpcCall sent to site ", $self->site_url,"\n";
-        print STDERR  "\tWebworkClient.pm ".__LINE__." full xmlrpcCall path ", ($self->site_url).'/'.REQUEST_URI,"\n";
+        print STDERR  "\n\tWebworkClient.pm ".__LINE__." xmlrpcCall sent to site ", $self->webservice_site_url,"\n";
+        print STDERR  "\tWebworkClient.pm ".__LINE__." full xmlrpcCall path ", ($self->webservice_site_url).'/'.REQUEST_URI,"\n";
     	print STDERR  "\tWebworkClient.pm ".__LINE__." xmlrpcCall issued with command $command\n";
     	print STDERR  "\tWebworkClient.pm ".__LINE__." input is: ",join(" ", map {$_//'--'} %{$self->request_object}),"\n";
     	print STDERR  "\tWebworkClient.pm ".__LINE__." xmlrpcCall $command initiated webwork webservice object. Object returned: $requestResult\n";
@@ -375,7 +375,7 @@ sub jsXmlrpcCall {
 	my $transporter = TRANSPORT_METHOD->new;
 	
 	my $requestResult = $transporter
-	    -> proxy(($self->site_url).'/'.REQUEST_URI);
+	    -> proxy(($self->webservice_site_url).'/'.REQUEST_URI);
 	$transporter->transport->ssl_opts(verify_hostname=>0,
 	     SSL_verify_mode => 'SSL_VERIFY_NONE');
 	
@@ -480,7 +480,7 @@ sub xml_utf_decode { # Do UTF-8 decoding where xml_filter applied encoding
 	return_object
 	error_string
 	fault
-	site_url  (https://mysite.edu)
+	webservice_site_url  (https://mysite.edu)
 	form_data
 	
 =cut 
@@ -521,17 +521,18 @@ sub fault {
 	$self->{fault_flag} =$fault_flag if defined $fault_flag and $fault_flag =~/\S/; # source is non-empty
 	$self->{fault_flag};
 }
-sub site_url {  #site_url  https://mysite.edu
+sub webservice_site_url {  #webservice_site_url  https://mysite.edu (the interior address if its in a container)
 	my $self = shift;
 	my $new_url = shift;
-	$self->{site_url} = $new_url if defined($new_url) and $new_url =~ /\S/;
-	$self->{site_url};
+	$self->{webservice_site_url} = $new_url if defined($new_url) and $new_url =~ /\S/;
+	$self->{webservice_site_url};
 }
 
-sub url {  #site_url  https://mysite.edu
+# to handle redundancy
+sub url {  #site_url  e.g. https://mysite.edu:8080 (if its in a container)
 	my $self = shift;
 	my $new_url = shift;
-	die "use webworkClient->site_url instead of webworkClient->url";
+	die "use webworkclient->webservice_site_url instead of webworkClient->url";
 	$self->{url} = $new_url if defined($new_url) and $new_url =~ /\S/;
 	$self->{url};
 }

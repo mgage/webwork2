@@ -3,42 +3,30 @@
 # don't use my here?
 #$lwpcurl= LWP::Curl->new(); I don't think this will do all the customization I want?
 ##!perl
-# use strict;
-# use warnings;
+use strict;
+use warnings;
 
-# use LWP::UserAgent;
-# 
-# my $ua = LWP::UserAgent->new( 'send_te' => '0' );
-# my $r  = HTTP::Request->new(
-#     'POST' => 'https://dev.adapt.libretexts.org/api/jwt-test',
-#     [
-#         'Accept' => 'application/json',
-#         'Authorization' =>
-# 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC8xMjcuMC4wLjE6ODAwMFwvYXBpXC9sb2dpbiIsImlhdCI6MTU5NzQzNzQ3OCwiZXhwIjoxNTk3NTIzODc4LCJuYmYiOjE1OTc0Mzc0NzgsImp0aSI6InRyS3NITTR2emhtZVNwaG8iLCJzdWIiOjEzLCJwcnYiOiI4N2UwYWYxZWY5ZmQxNTgxMmZkZWM5NzE1M2ExNGUwYjA0NzU0NmFhIn0.ZOLMvwuNBY4RmQR_eiHIL7MtFUvLSKS9X9Z9HrwvDBw',
-#         'Host'       => 'dev.adapt.libretexts.org:443',
-#         'User-Agent' => l 'curl/7.55.1'
-#     ],
-# 
-# );
-# my $adapt_call_return = eval{$ua->request( $r, )
-# };
-# 		if ($@) {warn "problem with curl call $@"};
-#  		$adapt_call_return = "return now from LWP::UserAgentadapt call: ".$adapt_call_return;
-# 
+use LWP::UserAgent;
 
-#
-# 
-# Created from curl command line
-# 
-# curl -s --request POST -H 'Accept: application/json' -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC8xMjcuMC4wLjE6ODAwMFwvYXBpXC9sb2dpbiIsImlhdCI6MTU5NzQzNzQ3OCwiZXhwIjoxNTk3NTIzODc4LCJuYmYiOjE1OTc0Mzc0NzgsImp0aSI6InRyS3NITTR2emhtZVNwaG8iLCJzdWIiOjEzLCJwcnYiOiI4N2UwYWYxZWY5ZmQxNTgxMmZkZWM5NzE1M2ExNGUwYjA0NzU0NmFhIn0.ZOLMvwuNBY4RmQR_eiHIL7MtFUvLSKS9X9Z9HrwvDBw" https://dev.adapt.libretexts.org/api/jwt-test
-	
-$adapt_call_return= eval{
-			$ADAPTcall = qq{/usr/bin/curl -s --request POST -H 'Accept: application/json' -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC8xMjcuMC4wLjE6ODAwMFwvYXBpXC9hc3NpZ25tZW50c1wvMVwvcXVlc3Rpb25zXC92aWV3IiwiaWF0IjoxNTk3Nzg2Nzc0LCJleHAiOjYxNTk3Nzg2Nzc0LCJuYmYiOjE1OTc3ODY3NzQsImp0aSI6Ik14Uzg2dGppMVc2ejJ6N1giLCJzdWIiOjEzLCJwcnYiOiI4N2UwYWYxZWY5ZmQxNTgxMmZkZWM5NzE1M2ExNGUwYjA0NzU0NmFhIiwiYWRhcHQiOnsiYXNzaWdubWVudF9pZCI6MSwicXVlc3Rpb25faWQiOjksInRlY2hub2xvZ3kiOiJ3ZWJ3b3JrIn0sIndlYndvcmsiOnsicHJvYmxlbVNlZWQiOiIxMjM0NTY3IiwiY291cnNlSUQiOiJkYWVtb25fY291cnNlIiwidXNlcklEIjoiZGFlbW9uIiwiY291cnNlX3Bhc3N3b3JkIjoiZGFlbW9uIiwic2hvd1N1bW1hcnkiOjEsImRpc3BsYXlNb2RlIjoiTWF0aEpheCIsImxhbmd1YWdlIjoiZW4iLCJvdXRwdXRmb3JtYXQiOiJsaWJyZXRleHRzIn19.SFVspn_cOsBrpchZe_Is1btej_UePEkIJOqL3WNG400" https://dev.adapt.libretexts.org/api/jwt-test
-						};
- 			qx{$ADAPTcall};
- 		};
-		if ($@) {warn "problem with curl call $@"};
- 		$adapt_call_return = "return now from adapt call: ".$adapt_call_return;
+
+my $ua = LWP::UserAgent->new( 'send_te' => '0' );
+my $r  = HTTP::Request->new(
+    'POST' => 'https://dev.adapt.libretexts.org/api/jwt-test',
+    [
+        'Accept' => 'application/json',
+        'Authorization' =>
+'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC8xMjcuMC4wLjE6ODAwMFwvYXBpXC9sb2dpbiIsImlhdCI6MTU5NzQzNzQ3OCwiZXhwIjoxNTk3NTIzODc4LCJuYmYiOjE1OTc0Mzc0NzgsImp0aSI6InRyS3NITTR2emhtZVNwaG8iLCJzdWIiOjEzLCJwcnYiOiI4N2UwYWYxZWY5ZmQxNTgxMmZkZWM5NzE1M2ExNGUwYjA0NzU0NmFhIn0.ZOLMvwuNBY4RmQR_eiHIL7MtFUvLSKS9X9Z9HrwvDBweyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC8xMjcuMC4wLjE6ODAwMFwvYXBpXC9hc3NpZ25tZW50c1wvMVwvcXVlc3Rpb25zXC92aWV3IiwiaWF0IjoxNTk3Nzg2Nzc0LCJleHAiOjYxNTk3Nzg2Nzc0LCJuYmYiOjE1OTc3ODY3NzQsImp0aSI6Ik14Uzg2dGppMVc2ejJ6N1giLCJzdWIiOjEzLCJwcnYiOiI4N2UwYWYxZWY5ZmQxNTgxMmZkZWM5NzE1M2ExNGUwYjA0NzU0NmFhIiwiYWRhcHQiOnsiYXNzaWdubWVudF9pZCI6MSwicXVlc3Rpb25faWQiOjksInRlY2hub2xvZ3kiOiJ3ZWJ3b3JrIn0sIndlYndvcmsiOnsicHJvYmxlbVNlZWQiOiIxMjM0NTY3IiwiY291cnNlSUQiOiJkYWVtb25fY291cnNlIiwidXNlcklEIjoiZGFlbW9uIiwiY291cnNlX3Bhc3N3b3JkIjoiZGFlbW9uIiwic2hvd1N1bW1hcnkiOjEsImRpc3BsYXlNb2RlIjoiTWF0aEpheCIsImxhbmd1YWdlIjoiZW4iLCJvdXRwdXRmb3JtYXQiOiJsaWJyZXRleHRzIn19.SFVspn_cOsBrpchZe_Is1btej_UePEkIJOqL3WNG400',
+        'Host'       => 'https://dev.adapt.libretexts.org/api/jwt-test',
+        'User-Agent' => 'curl/7.55.1'
+    ],
+
+);
+ my $adapt_call_return = eval{
+  							$ua->request( $r, )
+  };
+ if ($@) {warn "problem with curl call $@"};
+ $adapt_call_return = "return now from LWP::UserAgentadapt call: ".$adapt_call_return;
+
 
 my $libretexts_format = <<'ENDPROBLEMTEMPLATE';
 
@@ -87,7 +75,7 @@ $problemHeadText
 <div>
 	<h3> Curl call </h3>
 	<p>
-	$adapt_call_return 
+	adapt: $adapt_call_return 
 	</p>
 	<p>
         answer json: $JSONanswerTemplate

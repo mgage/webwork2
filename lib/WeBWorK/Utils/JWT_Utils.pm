@@ -1,12 +1,20 @@
 
 use base qw(Exporter);
+use JSON;
+use Crypt::JWT qw( decode_jwt encode_jwt);
+use LWP::UserAgent;
+use HTTP::Request;
 
 our @EXPORT    = ();
 our @EXPORT_OK = qw(
 	post_to_ADAPT
+	jwt2hash
+	hash2jwt
+	json2hash
+	hash2json
+	pp_hash
 );
 
-my $ua = LWP::UserAgent->new( 'send_te' => '0' );
 
 # this is a subroutine not a method
 
@@ -40,3 +48,33 @@ sub post_to_ADAPT {
 # _ msg (OK, Bad Request) 
 # _request
 }
+
+sub jwt2hash {
+	my %in = @_;
+	my $token = $in{token};
+	my $key = $in{key}//'s1r1rb1r1';
+	decode_jwt(token=>$token, key=>$key);
+	# FIXME -- make method? get key from $ce?
+}
+
+sub hash2jwt {
+	my %in = @_;
+	my $payload = $in{payload};
+	my $key = $in{key}//'s1r1b1r1';
+	encode_jwt(payload=>$payload, alg=>'HS256',key=>$key);
+}
+
+sub json2hash {
+	decode_json(shift);
+}
+
+sub hash2json {
+	encode_json(shift);
+}
+
+sub pp_hash {
+	$perl_hash_ref = shift;
+	to_json($perl_hash_ref, {utf8=>1, pretty=>1});
+}
+
+1;

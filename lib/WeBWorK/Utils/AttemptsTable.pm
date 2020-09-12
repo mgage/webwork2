@@ -193,8 +193,8 @@ sub new {
 	$self->mk_ro_accessors(qw(showAnswerNumbers showAttemptAnswers showHeadline
 	                          showAttemptPreviews showAttemptResults 
 	                          showCorrectAnswers showSummary));
-	$self->mk_ro_accessors(qw( answerTemplate JSONanswerTemplate JWTanswerTemplate));
-	$self->mk_accessors(qw(correct_ids incorrect_ids showMessages  summary));
+	$self->mk_ro_accessors(qw( answerTemplate JSONanswerTemplate JWTanswerTemplate answerTemplate_hash ));
+	$self->mk_accessors(qw(correct_ids incorrect_ids showMessages  summary ));
 	# sanity check and initialize imgGenerator.
 	_init($self, %options);
 	return $self;
@@ -353,19 +353,20 @@ sub make_JSON_JWT_answer_templates {
 	my $self = shift;
 	return unless 
 	my $rh_answers = $self->{answers};
-	my $hash_answer_template={};
+	my $answerTemplate_hash={};
 	return "" unless $self->answersSubmitted; # only print if there is at least one non-blank answer
 	my $answerNumber =0;
 	foreach my $ans_id (@{$self->answerOrder() }){
 		$answerNumber++;  # start with 1, this is also the row number
-		$hash_answer_template->{$answerNumber}=
+		$answerTemplate_hash->{$answerNumber}=
  							 {ans_id=>$ans_id,
  							 answer =>%{$rh_answers->{$ans_id}}//(), #FIXME to_json/freeze method needed for blessed reference???
  							 score =>($rh_answers->{$ans_id}->{score})//0, 
  							 };
 	}
-	$self->{JSONanswerTemplate} = encode_json $hash_answer_template;
-	$self->{JWTanswerTemplate}  = encode_jwt( payload =>$hash_answer_template, alg=>"HS256", key=>"s1r1b1r1");
+	$self->{answerTemplate_hash}= $answerTemplate_hash;
+	$self->{JSONanswerTemplate} = encode_json $answerTemplate_hash;
+	$self->{JWTanswerTemplate}  = encode_jwt( payload =>$answerTemplate_hash, alg=>"HS256", key=>"s1r1b1r1");
 }
 
 #################################################

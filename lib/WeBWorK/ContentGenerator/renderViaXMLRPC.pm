@@ -169,35 +169,65 @@ sub pre_header_initialize {
 	$hash_from_web_form{outputformat} = $hash_from_web_form{custom_outputformat} if $hash_from_web_form{custom_outputformat};
 	
 
-	#dereference these variables for error reporting in the next two conditional statements 
-	my $user_id      = $hash_from_web_form{userID};
-	my $courseID   = $hash_from_web_form{courseID};
-	my $displayMode  = $hash_from_web_form{displayMode};
-	my $problemSeed  = $hash_from_web_form{problemSeed};
 
 	# some additional override operations are done if there is a JSONWebToken (JWT) present
-	my $webworkJWT  = $hash_from_web_form{webworkJWT}//'';
-	if ($webworkJWT) {
-		my $sourceFilePath = $hash_from_web_form{sourceFilePath}//'';
-		my $payload = decode_jwt(token=>$webworkJWT, key=>'s1r1b1r1', accepted_alg=>'HS256'); # TODO REMOVE INSECURE DEVELOPMENT KEY
-		#TODO add validation of expiration (exp), issue time (iat), not before (nbf), issuer (iss), and audience (aud).
-		# verify_exp=>1, verify_iat=>1, verify_nbf=>1, verify_exp=>1, verify_aud=>"webwork", verify_iss=>""
+	my $problemJWT  = $hash_from_web_form{problemJWT}//'';
+	if ($problemJWT) { #take all data from the problemJWT_payload
+		my $problemJWT_payload = decode_jwt(token=>$problemJWT, key=>'webwork', accepted_alg=>'HS256'); # TODO REMOVE INSECURE DEVELOPMENT KEY
+		unless ($problemJWT_payload->{webwork}) {
+			croak("problemJWT does not contain 'webwork' field in problemJWT_payload");
+		}
+		#TODO add validation of expiration (exp),
+		# issue time (iat), 
+		# not before (nbf), 
+		# issuer (iss), and 
+		# audience (aud).
+		# verify_exp=>1, 
+		# verify_iat=>1, 
+		# verify_nbf=>1, 
+		# verify_exp=>1, 
+		# verify_aud=>"webwork", 
+		# verify_iss=>""
 		#TODO switch to asymmetric keys and JWT encrpytion [JSON Web Encryption (JWE)].
 
-		#store JWT and decoded payload for future use. 
-		$hash_from_web_form{jwt_payload}=$payload;  
-		#$hash_from_web_form{webworkJWT};  # encoded JWT already present and is  passed on
-
-		#override hash_from_web_form if keys are present
-		# override protected hash_from_web_form values from the payload 
-		for my $key (qw(userID courseID displayMode problemSeed
-		                course_password answersSubmitted problemSeed problemUUID sourceFilePath 
-		                outputformat)
+	   # get sessionJWT (anything else you want preserved)
+		
+		my $sessionJWT  = $hash_from_web_form{sessionJWT}//'';
+		
+		# erase hash_from_web_form and reload
+		#%hash_from_web_form=(); # overwrite instead of erasing
+	
+		$hash_from_web_form{problemJWT}= $problemJWT;
+		
+	
+		warn "\nproblemJWT  $problemJWT\n\n"; 
+		warn "problemJWT_payload $problemJWT_payload \n";
+		foreach my $key (qw(answersSubmitted course_password courseID displayMode 
+		                language outputformat problemSeed problemSeed problemUUID 
+		                showSummary sourceFilePath userID 
+						)
 		            ) {
-					$hash_from_web_form{$key} = $payload->{$key} if  ($payload->{$key});
-					# use defined to allow zero values in payload to override hash_from_web_form
+					$hash_from_web_form{$key} = $problemJWT_payload->{webwork}{$key}; 
 		}
-		 
+		$hash_from_web_form{problemJWT}= $problemJWT;  # stable the original JWT to problemJWT_payload	
+		$hash_from_web_form{problemJWT_payload}=$problemJWT_payload;
+		# set state
+		if ($sessionJWT)   {
+		warn "\n sessionJWT  $sessionJWT\n\n"; 
+	
+			my $sessionJWT_payload = decode_jwt(token=>$sessionJWT, key=>'webwork', accepted_alg=>'HS256'); # TODO REMOVE INSECURE DEVELOPMENT KEY
+			warn "sessionJWT_payload $sessionJWT_payload \n";
+			#update hash variables from sessionState
+			#  qw(answersSubmitted problemSource session_key )
+			$hash_from_web_form{answersSubmitted}= 1; #$sessionJWT_payload->{answersSubmitted};
+		}
+		
+		#dereference these variables for error reporting  
+		my $user_id       = $hash_from_web_form{userID};
+		my $courseID      = $hash_from_web_form{courseID};
+		my $displayMode   = $hash_from_web_form{displayMode};
+		my $problemSeed   = $hash_from_web_form{problemSeed};
+        my $sourceFilePath = $hash_from_web_form{sourceFilePath};
 		# sanity check
 		if ($hash_from_web_form{jwt_debug}){ 
 			#unit test of passing in variables
@@ -206,14 +236,14 @@ sub pre_header_initialize {
 			print CGI::ul( 
 				  CGI::h1("JWT is present"),
 				  CGI::li(CGI::escapeHTML([
-					"webworkJWT: |$webworkJWT|",
+					"problemJWT: |$problemJWT|",
 					"userID: |$hash_from_web_form{userID}|",
 					"courseID: |$hash_from_web_form{courseID}|",
 					"course_password: |$hash_from_web_form{course_password}|",
 					"sourceFilePath: |$hash_from_web_form{sourceFilePath}|",
 					"displayMode: |$hash_from_web_form{displayMode}|",
 					"problemSeed: |$hash_from_web_form{problemSeed}|",
-					"jwt_payload: |",encode_json($hash_from_web_form{jwt_payload}),"|",
+					"problemJWT_payload: |",encode_json($hash_from_web_form{problemJWT_payload}),"|",
 				  ])
 				  )
 			);
@@ -222,12 +252,16 @@ sub pre_header_initialize {
 		# emergency hacks   FIXME
 	
 	} # end jwt special case
-
-    # I believe this was erasing the default envir defined in webworkClient/webworkWebservice
-	#$hash_from_web_form{envir}->{displayMode} = $hash_from_web_form{displayMode};
-	#$hash_from_web_form{envir}->{problemSeed} = $hash_from_web_form{problemSeed};
 	
+	#dereference these variables for error reporting  
+		my $user_id      = $hash_from_web_form{userID};
+		my $courseID     = $hash_from_web_form{courseID};
+		my $displayMode  = $hash_from_web_form{displayMode};
+		my $problemSeed  = $hash_from_web_form{problemSeed};
+		my $sourceFilePath =$hash_from_web_form{sourceFilePath};
+ 
 	unless ( $user_id && $courseID && $displayMode && $problemSeed) {
+
 		#sanity check for required variables
 		print CGI::ul( 
 		      CGI::h1("Missing essential data in web dataform:"),
@@ -236,7 +270,8 @@ sub pre_header_initialize {
 		      	"courseID: |$courseID|",	
 		        "displayMode: |$displayMode|", 
 		        "problemSeed: |$problemSeed|",
-		        "webworkJWT: |$webworkJWT|",
+		        "sourceFilePath: |sourceFilePath|",
+		        "problemJWT: |$problemJWT|",
 		      ])));
 		return;
 	}
@@ -259,7 +294,7 @@ sub pre_header_initialize {
 	$xmlrpc_client->{outputformat}    = $hash_from_web_form{outputformat};
 	$xmlrpc_client->{sourceFilePath}  = $hash_from_web_form{sourceFilePath}; #for fetching problemSource
 	                                             # from files stored on the WebworkWebservice server (e.g. OPL) 
-	# $xmlrpc_client->{webworkJWT}     = $hash_from_web_form{webworkJWT}//''; can be obtained from hash_from_web_form
+	$xmlrpc_client->{problemJWT}     = $hash_from_web_form{problemJWT}//'not defined in webwork hash'; 
 	# in addition to the arguments above the hash_from_web_form contains parameters for the pg_environment
 	$xmlrpc_client->{inputs_ref}      = \%hash_from_web_form;  # contains GET parameters from form
     #FIXME need new name for inputs_ref

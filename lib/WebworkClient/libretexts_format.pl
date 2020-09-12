@@ -2,13 +2,6 @@
 
 # don't use my here?
 
-use WeBWorK::Utils::JWT_Utils qw(post_to_ADAPT);
-
-#my $jwt_input = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC8xMjcuMC4wLjE6ODAwMFwvYXBpXC9sb2dpbiIsImlhdCI6MTU5NzQzNzQ3OCwiZXhwIjoxNTk3NTIzODc4LCJuYmYiOjE1OTc0Mzc0NzgsImp0aSI6InRyS3NITTR2emhtZVNwaG8iLCJzdWIiOjEzLCJwcnYiOiI4N2UwYWYxZWY5ZmQxNTgxMmZkZWM5NzE1M2ExNGUwYjA0NzU0NmFhIn0.ZOLMvwuNBY4RmQR_eiHIL7MtFUvLSKS9X9Z9HrwvDBweyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC8xMjcuMC4wLjE6ODAwMFwvYXBpXC9hc3NpZ25tZW50c1wvMVwvcXVlc3Rpb25zXC92aWV3IiwiaWF0IjoxNTk3Nzg2Nzc0LCJleHAiOjYxNTk3Nzg2Nzc0LCJuYmYiOjE1OTc3ODY3NzQsImp0aSI6Ik14Uzg2dGppMVc2ejJ6N1giLCJzdWIiOjEzLCJwcnYiOiI4N2UwYWYxZWY5ZmQxNTgxMmZkZWM5NzE1M2ExNGUwYjA0NzU0NmFhIiwiYWRhcHQiOnsiYXNzaWdubWVudF9pZCI6MSwicXVlc3Rpb25faWQiOjksInRlY2hub2xvZ3kiOiJ3ZWJ3b3JrIn0sIndlYndvcmsiOnsicHJvYmxlbVNlZWQiOiIxMjM0NTY3IiwiY291cnNlSUQiOiJkYWVtb25fY291cnNlIiwidXNlcklEIjoiZGFlbW9uIiwiY291cnNlX3Bhc3N3b3JkIjoiZGFlbW9uIiwic2hvd1N1bW1hcnkiOjEsImRpc3BsYXlNb2RlIjoiTWF0aEpheCIsImxhbmd1YWdlIjoiZW4iLCJvdXRwdXRmb3JtYXQiOiJsaWJyZXRleHRzIn19.SFVspn_cOsBrpchZe_Is1btej_UePEkIJOqL3WNG400";
-
-#my $json_input = pp_hash( jwt2hash($jwt_input));
-
-our $adapt_call_return = post_to_ADAPT($jwt_input);
 
 
 my $libretexts_format = <<'ENDPROBLEMTEMPLATE';
@@ -55,18 +48,22 @@ $problemHeadText
 <div class="container-fluid">
 <div class="row-fluid">
 <div class="span12 problem">
-<div>
+<div style="display:none">
 	<h3> Curl call </h3>
 	<p>
-	adapt: $adapt_call_return 
-	adapt_input: $json_input
+	problemJWT is  $problemJWT<br/>
+	answerJWT  is  $answerJWT<br/>
+	decode problemJWT:    |$decode_problemJWT| <br/>
+	decode answerJWT:    |$decode_answerJWT| <br/>
+	</p><p>
+	adapt_return_from_problemJWT: $adapt_call_return_problemJWT <br/>
+	adapt_return_from_answerJWT: $adapt_call_return_answerJWT <br/>
+
+
 	</p>
-	<p>
-        answer json: $JSONanswerTemplate
+	<p> answerTemplate_hash:  $answerTemplate_hash;<br/>
+        answer json: $JSONanswerTemplate<br/>
         </p>
-	<p>
-	answer jwt: $JWTanswerTemplate
-	</p>
 </div>
 
 
@@ -97,7 +94,6 @@ $LTIGradeMessage
 <input type="hidden" name="problemSeed" value="$problemSeed"> 
 <input type="hidden" name="problemUUID" value="$problemUUID">
 <input type="hidden" name="psvn" value="$psvn">
-<input type="hidden" name="pathToProblemFile" value="$fileName">
 <input type="hidden" name="courseName" value="$courseID">
 <input type="hidden" name="courseID" value="$courseID">
 <input type="hidden" name="userID" value="$userID">
@@ -108,8 +104,8 @@ $LTIGradeMessage
 <input type="hidden" name="language" value="$formLanguage">
 <input type="hidden" name="showSummary" value="$showSummary">
 <input type="hidden" name="forcePortNumber" value="$forcePortNumber">
-
-
+<input type="hidden" name="problemJWT" value="$problemJWT">
+<input type="hidden" name="sessionJWT" value="$sessionJWT">
 <p>
 <input type="submit" name="preview"  value="$STRING_Preview" />
 <input type="submit" name="WWsubmit" value="$STRING_Submit"/>

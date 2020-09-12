@@ -36,6 +36,7 @@ use Encode qw(encode_utf8 decode_utf8);
 use JSON;
 use Crypt::JWT;
 use LWP::Curl;
+use WeBWorK::Utils::JWT_Utils qw(post_to_ADAPT pp_hash jwt2hash);
 
 our $UNIT_TESTS_ON  = 0; 
 
@@ -79,6 +80,8 @@ our $imgGen = WeBWorK::PG::ImageGenerator->new(
 );
 warn "image Generator is $imgGen";
 
+# constructor for FormatRenderedProblem object 
+
 sub new {
     my $invocant = shift;
     my $class = ref $invocant || $invocant;
@@ -115,6 +118,8 @@ sub site_url {
 	$self->{site_url} = $new_url if defined($new_url) and $new_url =~ /\S/;
 	$self->{site_url};
 }
+
+# this subroutine is also used from WebworkClient so "self" might refer to a WebworkClient object
 sub formatRenderedProblem {
 	my $self 			  = shift;
 	my $problemText       ='';
@@ -271,7 +276,10 @@ sub formatRenderedProblem {
 	my $psvn             =  $self->{inputs_ref}->{psvn}//54321;
 	my $session_key      =  $rh_result->{session_key}//'';
 	my $displayMode      =  $self->{inputs_ref}->{displayMode};
-	
+	my $problemJWT       = ($self->{inputs_ref}->{problemJWT})//'undefined in webworkclient->inputs_ref';
+	my $problemJWT_payload      = ($self->{inputs_ref}->{problemJWT_payload})//'undefined in webworkclient->inputs_ref';
+	# DEBUG
+	my $inputs_ref = $self->{inputs_ref}//'inputs ref not defined in FormatRenderer';
 
 	my $previewMode      =  defined($self->{inputs_ref}->{preview})||0;
 	my $checkMode        =  defined($self->{inputs_ref}->{WWcheck})||0; #not yet used
@@ -285,7 +293,6 @@ sub formatRenderedProblem {
 	my $problemResult    =  $rh_result->{problem_result}//'';
 	my $problemState     =  $rh_result->{problem_state}//'';
 	my $showSummary      = ($self->{inputs_ref}->{showSummary})//1; #default to show summary for the moment
-
 	my $scoreSummary     =  '';
 
 
@@ -307,9 +314,8 @@ sub formatRenderedProblem {
 
 
 	my $answerTemplate = $tbl->answerTemplate;
-	my $JSONanswerTemplate = $tbl->JSONanswerTemplate;
-	my $JWTanswerTemplate  = $tbl->JWTanswerTemplate;	
-
+	my $JSONanswerTemplate= $tbl->JSONanswerTemplate;
+	my $answerTemplate_hash= $tbl->answerTemplate_hash;
 	my $color_input_blanks_script = $tbl->color_answer_blanks;
 	$tbl->imgGen->render(refresh => 1) if $tbl->displayMode eq 'images';
 	
@@ -446,16 +452,16 @@ EOS
 	my $STRING_Preview     = $mt->maketext("Preview My Answers");
 	my $STRING_ShowCorrect = $mt->maketext("Show correct answers");
 	my $STRING_Submit      = $mt->maketext("Check Answers");
-
-
+    #DEBUG FIXME
+    my $display_self ="display_self".join(" | ", %{$self->{inputs_ref}});
 ######################################################
 # Return interpolated problem template
 ######################################################
 
 	my $format_name = $self->{inputs_ref}->{outputformat}//'standard';
 
-    # The json output format is special and cannot be handled by the
-	# the standard code
+##### The json output format is special and cannot be handled by the
+##### the standard code
 	if ( $format_name eq "json" ) {
 	  my %output_data_hash;
 	  my $key_value_pairs = do("WebworkClient/${format_name}_format.pl");
@@ -487,7 +493,37 @@ EOS
 	  return $json_output_data;
 	}
 	
-	# The libretexts format also requires special preparation
+##### The libretexts format also requires special preparation.  We need to create an
+##### answerJWT+ 
+	my $answerTemplate_hash=$tbl->answerTemplate_hash;
+    my $JSONanswerTemplate = $tbl -> JSONanswerTemplate;
+	my $answerJWT_hash = {
+		score => $answerTemplate_hash,
+		problemJWT => $problemJWT,
+	};
+		
+			# transfer credentials from payload
+	foreach my $key (qw(name exp iat nbf iss sub prv jti )) {
+		$answerJWT_hash->{$key} = $problemJWT_payload->{$key}//'';
+	}
+
+##### sessionJWT
+	my $sessionJWT_hash = {answersSubmitted=>1};
+	my $sessionJWT  = encode_jwt( payload =>$sessionJWT_hash, alg=>"HS256", key=>"webwork");
+	$answerJWT_hash->{sessionJWT}=$sessionJWT;
+	
+	$answerJWT  = encode_jwt( payload =>$answerJWT_hash, alg=>"HS256", key=>"webwork");
+
+
+
+
+
+
+
+	my $decode_problemJWT = pp_hash(jwt2hash(token=>$problemJWT,key=>'webwork'));
+	my $decode_answerJWT = pp_hash(jwt2hash(token=>$answerJWT,key=>'webwork'));
+	my $adapt_call_return_problemJWT = post_to_ADAPT($problemJWT);
+	my $adapt_call_return_answerJWT = post_to_ADAPT($answerJWT);
 
 
 # all other formats except for json_format

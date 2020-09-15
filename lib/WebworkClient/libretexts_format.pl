@@ -48,7 +48,7 @@ $problemHeadText
 <div class="container-fluid">
 <div class="row-fluid">
 <div class="span12 problem">
-<div style="display:none">
+<div style="">
 	<h3> Curl call </h3>
 	<p>
 	problemJWT is  $problemJWT<br/>

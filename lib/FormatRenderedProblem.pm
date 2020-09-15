@@ -495,8 +495,9 @@ EOS
 	
 ##### The libretexts format also requires special preparation.  We need to create an
 ##### answerJWT+ 
+if ($format_name eq 'libretexts') {
 	my $answerTemplate_hash=$tbl->answerTemplate_hash;
-    my $JSONanswerTemplate = $tbl -> JSONanswerTemplate;
+	my $JSONanswerTemplate = $tbl -> JSONanswerTemplate;
 	my $answerJWT_hash = {
 		score => $answerTemplate_hash,
 		problemJWT => $problemJWT,
@@ -524,7 +525,7 @@ EOS
 	my $decode_answerJWT = pp_hash(jwt2hash(token=>$answerJWT,key=>'webwork'));
 	my $adapt_call_return_problemJWT = post_to_ADAPT($problemJWT);
 	my $adapt_call_return_answerJWT = post_to_ADAPT($answerJWT);
-
+}
 
 # all other formats except for json_format
 	# find the appropriate template in WebworkClient folder

@@ -204,7 +204,7 @@ sub pre_header_initialize {
 	
 		warn "\nproblemJWT  $problemJWT\n\n"; 
 		warn "problemJWT_payload $problemJWT_payload \n";
-		foreach my $key (qw(course_password courseID displayMode 
+		foreach my $key (qw(submittedAnswers course_password courseID displayMode 
 		                language outputformat problemSeed problemSeed problemUUID 
 		                showSummary sourceFilePath userID 
 						)
@@ -221,7 +221,7 @@ sub pre_header_initialize {
 			warn "sessionJWT_payload $sessionJWT_payload \n";
 			#update hash variables from sessionState
 			#  qw(answersSubmitted problemSource session_key )
-			$hash_from_web_form{answersSubmitted}= 1; #$sessionJWT_payload->{answersSubmitted};
+			$hash_from_web_form{answersSubmitted}= $sessionJWT_payload->{answersSubmitted};
 		}
 		
 		#dereference these variables for error reporting  

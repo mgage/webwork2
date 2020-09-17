@@ -534,7 +534,7 @@ if ($format_name eq 'libretexts') {
 	$decode_problemJWT = pretty_print(jwt2hash(token=>$problemJWT,key=>'webwork'));
 	$decode_answerJWT = pretty_print(jwt2hash(token=>$answerJWT,key=>'webwork'));
 	$decode_sessionJWT = pretty_print(jwt2hash(token=>$sessionJWT,key=>'webwork'));
-	$adapt_call_return_problemJWT = post_to_ADAPT($problemJWT);
+	# $adapt_call_return_problemJWT = post_to_ADAPT($problemJWT);
 	$adapt_call_return_answerJWT = post_to_ADAPT($answerJWT);
 }
  

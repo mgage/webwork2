@@ -39,6 +39,8 @@ use WeBWorK::Debug;
 use CGI;
 use JSON;
 use Crypt::JWT qw( decode_jwt encode_jwt);
+use Carp;
+
 =head1 Description
 
 
@@ -162,11 +164,11 @@ sub pre_header_initialize {
 	# the following parameters are destined for the pg_environment variable (envir)
 	# and are not otherwise needed to set up the renderer 
 	
-	$hash_from_web_form{answersSubmitted} = $hash_from_web_form{custom_answerssubmitted} if $hash_from_web_form{custom_answerssubmitted};
-	$hash_from_web_form{problemSeed} = $hash_from_web_form{custom_problemseed} if $hash_from_web_form{custom_problemseed};
+	$hash_from_web_form{answersSubmitted} = $hash_from_web_form{custom_answerssubmitted} if defined $hash_from_web_form{custom_answerssubmitted};
+	$hash_from_web_form{problemSeed} = $hash_from_web_form{custom_problemseed} if defined $hash_from_web_form{custom_problemseed};
 	$hash_from_web_form{problemUUID} = $hash_from_web_form{problemUUID}//$hash_from_web_form{problemIdentifierPrefix}; # earlier version of problemUUID
-	$hash_from_web_form{sourceFilePath} = $hash_from_web_form{custom_sourcefilepath} if $hash_from_web_form{custom_sourcefilepath};
-	$hash_from_web_form{outputformat} = $hash_from_web_form{custom_outputformat} if $hash_from_web_form{custom_outputformat};
+	$hash_from_web_form{sourceFilePath} = $hash_from_web_form{custom_sourcefilepath} if defined $hash_from_web_form{custom_sourcefilepath};
+	$hash_from_web_form{outputformat} = $hash_from_web_form{custom_outputformat} if defined $hash_from_web_form{custom_outputformat};
 	
 
 

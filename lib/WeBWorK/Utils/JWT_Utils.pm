@@ -36,9 +36,15 @@ sub post_to_ADAPT {
 	  };
 	 if ($@) {
 		warn "problem with curl call $@";
+		return $@;
 	 }
 	 else {
-		return $adapt_call_hash->{_content};
+	 	if ($adapt_call_hash->{_rc}==200){
+	 		return "ok".$adapt_call_hash->{_content}
+	 	}
+	 	else {
+	 		return "not_ok".$adapt_call_hash->{_rc}
+	 	}
 	 }
 # other fields returned in this hash -- possibly useful for debugging
 # _headers
@@ -50,7 +56,7 @@ sub post_to_ADAPT {
 
 sub jwt2hash {
 	my %in = @_;
-	my $token = $in{token}//'';
+	my $token = $in{token}//'0';
 	my $key = $in{key}//'webwork';
 	decode_jwt(token=>$token, key=>$key);
 	# FIXME -- make method? get key from $ce?

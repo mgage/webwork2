@@ -81,25 +81,27 @@ our $imgGen = WeBWorK::PG::ImageGenerator->new(
 warn "image Generator is $imgGen";
 
 # constructor for FormatRenderedProblem object 
+# this is not used when WebworkClient and FormatRenderedProblem are combined
+# I think it is used in the "standalone server version"
 
-sub new {
-    my $invocant = shift;
-    my $class = ref $invocant || $invocant;
-	$self = {
-		return_object   => {},
-		encoded_source  => {},
-		sourceFilePath  => '',
-		site_url        => 'https://demo.webwork.rochester.edu',
-		form_action_url =>'',
-		maketext        => sub {return @_}, 
-		courseID        => 'daemon_course',  # optional?
-		userID          => 'daemon',  # optional?
-		course_password => 'daemon',
-		inputs_ref      => {},	  
-		@_,
-	};
-	bless $self, $class;
-}
+# sub new {
+#     my $invocant = shift;
+#     my $class = ref $invocant || $invocant;
+# 	my $self = {
+# 		return_object   => {},
+# 		encoded_source  => {},
+# 		sourceFilePath  => '',
+# 		site_url        => 'https://demo.webwork.rochester.edu',
+# 		form_action_url =>'',
+# 		maketext        => sub {return @_}, 
+# 		courseID        => 'daemon_course',  # optional?
+# 		userID          => 'daemon',  # optional?
+# 		course_password => 'daemon',
+# 		inputs_ref      => {},	  
+# 		@_,
+# 	};
+# 	bless $self, $class;
+# }
 sub return_object {   # out
 	my $self = shift;
 	my $object = shift;
@@ -248,7 +250,10 @@ sub formatRenderedProblem {
 
 
 	$self->{outputformats}={};
-	my $SITE_URL      	 =  $seedce->{server_root_url }; #$self->site_url//'';
+	
+	# prepare constants to be interpolated into the _formats files
+	
+	my $SITE_URL         =	'localhost'; #'$self->site_url//'';
 	my $FORM_ACTION_URL  =  $self->{form_action_url}//'';
 
 	#################################################
@@ -314,8 +319,6 @@ sub formatRenderedProblem {
 
 
 	my $answerTemplate = $tbl->answerTemplate;
-	my $JSONanswerTemplate= $tbl->JSONanswerTemplate;
-	my $answerTemplate_hash= $tbl->answerTemplate_hash;
 	my $color_input_blanks_script = $tbl->color_answer_blanks;
 	$tbl->imgGen->render(refresh => 1) if $tbl->displayMode eq 'images';
 	
@@ -495,11 +498,18 @@ EOS
 	
 ##### The libretexts format also requires special preparation.  We need to create an
 ##### answerJWT+ 
+
+my($answerTemplate_hash, $JSONanswerTemplate, $answerJWT_hash,
+	$sessionJWT_hash, $decode_problemJWT, 
+	$decode_answerJWT,
+	$adapt_call_return_problemJWT,$adapt_call_return_answerJWT
+);
+# these need to be declared outside the if block
 if ($format_name eq 'libretexts') {
-	my $answerTemplate_hash=$tbl->answerTemplate_hash;
-	my $JSONanswerTemplate = $tbl -> JSONanswerTemplate;
-	my $answerJWT_hash = {
-		score => $answerTemplate_hash,
+	 $answerTemplate_hash= pretty_print($tbl->answerTemplate_hash ); #$tbl->answerTemplate_hash;
+	 $JSONanswerTemplate = $tbl -> JSONanswerTemplate;
+	 $answerJWT_hash = {
+		score => $JSONanswerTemplate,
 		problemJWT => $problemJWT,
 	};
 		
@@ -509,8 +519,8 @@ if ($format_name eq 'libretexts') {
 	}
 
 ##### sessionJWT
-	my $sessionJWT_hash = {answersSubmitted=>1};
-	my $sessionJWT  = encode_jwt( payload =>$sessionJWT_hash, alg=>"HS256", key=>"webwork");
+	$sessionJWT_hash = {answersSubmitted=>1};
+	$sessionJWT  = encode_jwt( payload =>$sessionJWT_hash, alg=>"HS256", key=>"webwork");
 	$answerJWT_hash->{sessionJWT}=$sessionJWT;
 	
 	$answerJWT  = encode_jwt( payload =>$answerJWT_hash, alg=>"HS256", key=>"webwork");
@@ -521,12 +531,12 @@ if ($format_name eq 'libretexts') {
 
 
 
-	my $decode_problemJWT = pp_hash(jwt2hash(token=>$problemJWT,key=>'webwork'));
-	my $decode_answerJWT = pp_hash(jwt2hash(token=>$answerJWT,key=>'webwork'));
-	my $adapt_call_return_problemJWT = post_to_ADAPT($problemJWT);
-	my $adapt_call_return_answerJWT = post_to_ADAPT($answerJWT);
+	$decode_problemJWT = #pp_hash(jwt2hash(token=>$problemJWT,key=>'webwork'));
+	$decode_answerJWT = #pp_hash(jwt2hash(token=>$answerJWT,key=>'webwork'));
+	$adapt_call_return_problemJWT = post_to_ADAPT($problemJWT);
+	$adapt_call_return_answerJWT = post_to_ADAPT($answerJWT);
 }
-
+ 
 # all other formats except for json_format
 	# find the appropriate template in WebworkClient folder
 	my $template = do("WebworkClient/${format_name}_format.pl");

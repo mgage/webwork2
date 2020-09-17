@@ -84,24 +84,24 @@ warn "image Generator is $imgGen";
 # this is not used when WebworkClient and FormatRenderedProblem are combined
 # I think it is used in the "standalone server version"
 
-# sub new {
-#     my $invocant = shift;
-#     my $class = ref $invocant || $invocant;
-# 	my $self = {
-# 		return_object   => {},
-# 		encoded_source  => {},
-# 		sourceFilePath  => '',
-# 		site_url        => 'https://demo.webwork.rochester.edu',
-# 		form_action_url =>'',
-# 		maketext        => sub {return @_}, 
-# 		courseID        => 'daemon_course',  # optional?
-# 		userID          => 'daemon',  # optional?
-# 		course_password => 'daemon',
-# 		inputs_ref      => {},	  
-# 		@_,
-# 	};
-# 	bless $self, $class;
-# }
+sub new {
+    my $invocant = shift;
+    my $class = ref $invocant || $invocant;
+	my $self = {
+		return_object   => {},
+		encoded_source  => {},
+		sourceFilePath  => '',
+		site_url        => 'https://demo.webwork.rochester.edu',
+		form_action_url =>'',
+		maketext        => sub {return @_}, 
+		courseID        => 'daemon_course',  # optional?
+		userID          => 'daemon',  # optional?
+		course_password => 'daemon',
+		inputs_ref      => {},	  
+		@_,
+	};
+	bless $self, $class;
+}
 sub return_object {   # out
 	my $self = shift;
 	my $object = shift;
@@ -509,7 +509,7 @@ if ($format_name eq 'libretexts') {
 	 $answerTemplate_hash= pretty_print($tbl->answerTemplate_hash ); #$tbl->answerTemplate_hash;
 	 $JSONanswerTemplate = $tbl -> JSONanswerTemplate;
 	 $answerJWT_hash = {
-		score => $JSONanswerTemplate,
+		score => $tbl->answerTemplate_hash, #$JSONanswerTemplate,
 		problemJWT => $problemJWT,
 	};
 		
@@ -531,8 +531,9 @@ if ($format_name eq 'libretexts') {
 
 
 
-	$decode_problemJWT = #pp_hash(jwt2hash(token=>$problemJWT,key=>'webwork'));
-	$decode_answerJWT = #pp_hash(jwt2hash(token=>$answerJWT,key=>'webwork'));
+	$decode_problemJWT = pretty_print(jwt2hash(token=>$problemJWT,key=>'webwork'));
+	$decode_answerJWT = pretty_print(jwt2hash(token=>$answerJWT,key=>'webwork'));
+	$decode_sessionJWT = pretty_print(jwt2hash(token=>$sessionJWT,key=>'webwork'));
 	$adapt_call_return_problemJWT = post_to_ADAPT($problemJWT);
 	$adapt_call_return_answerJWT = post_to_ADAPT($answerJWT);
 }

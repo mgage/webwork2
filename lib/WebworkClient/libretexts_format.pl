@@ -48,21 +48,41 @@ $problemHeadText
 <div class="container-fluid">
 <div class="row-fluid">
 <div class="span12 problem">
-<div style="display:none">
+<div style="">
 	<h3> Curl call </h3>
-	<p>
-	problemJWT is  $problemJWT<br/>
-	answerJWT  is  $answerJWT<br/>
-	problemJWT_payload $problemJWT_payload<br/>
-	decode problemJWT:    |$decode_problemJWT| <br/>
-	decode answerJWT:    |$decode_answerJWT| <br/>
-	</p><p>
+
+<p>
+	problemJWT is  $problemJWT
+</p>
+
+<p>
+	answerJWT  is  $answerJWT
+</p>
+
+<p>
+	problemJWT_payload $problemJWT_payload
+</p>
+
+<p>
+	decode problemJWT:    |$decode_problemJWT| 
+</p>
+
+<p>
+	decode answerJWT:    |$decode_answerJWT| 
+</p>
+
+<p>
+	decode sessionJWT:    |$decode_sessionJWT| 
+</p>
+
+	
+<p>
 	adapt_return_from_problemJWT: |$adapt_call_return_problemJWT| <br/>
 	adapt_return_from_answerJWT:  |$adapt_call_return_answerJWT| <br/>
 
 
 	</p>
-	<p> answerTemplate_hash:  $answerTemplate_hash;<br/>
+	<p> <!-- answerTemplate_hash:  $answerTemplate_hash;<br/> -->
         JSONanswerTemplate: $JSONanswerTemplate<br/>
         </p>
         

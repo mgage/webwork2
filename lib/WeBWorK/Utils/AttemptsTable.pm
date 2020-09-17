@@ -150,7 +150,7 @@ use strict;
 use warnings;
 use Scalar::Util 'blessed';
 use WeBWorK::Utils 'wwRound';
-use JSON;
+use JSON qw(encode_json decode_json);
 use Crypt::JWT qw(decode_jwt encode_jwt);
 use CGI;
 
@@ -360,7 +360,7 @@ sub make_JSON_JWT_answer_templates {
 		$answerNumber++;  # start with 1, this is also the row number
 		$answerTemplate_hash->{$answerNumber}=
  							 {ans_id=>$ans_id,
- 							 answer =>%{$rh_answers->{$ans_id}}//(), #FIXME to_json/freeze method needed for blessed reference???
+ 							 answer =>$rh_answers->{$ans_id}//'', #FIXME to_json/freeze method needed for blessed reference???
  							 score =>($rh_answers->{$ans_id}->{score})//0, 
  							 };
 	}

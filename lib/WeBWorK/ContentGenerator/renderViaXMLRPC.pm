@@ -202,7 +202,7 @@ sub pre_header_initialize {
 	
 		warn "\nproblemJWT  $problemJWT\n\n"; 
 		warn "problemJWT_payload $problemJWT_payload \n";
-		foreach my $key (qw(answersSubmitted course_password courseID displayMode 
+		foreach my $key (qw(course_password courseID displayMode 
 		                language outputformat problemSeed problemSeed problemUUID 
 		                showSummary sourceFilePath userID 
 						)
@@ -213,7 +213,7 @@ sub pre_header_initialize {
 		$hash_from_web_form{problemJWT_payload}=$problemJWT_payload;
 		# set state
 		if ($sessionJWT)   {
-		warn "\n sessionJWT  $sessionJWT\n\n"; 
+		warn "\n\n\n sessionJWT  $sessionJWT\n\n"; 
 	
 			my $sessionJWT_payload = decode_jwt(token=>$sessionJWT, key=>'webwork', accepted_alg=>'HS256'); # TODO REMOVE INSECURE DEVELOPMENT KEY
 			warn "sessionJWT_payload $sessionJWT_payload \n";

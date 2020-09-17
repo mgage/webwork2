@@ -77,7 +77,6 @@ $problemHeadText
 
 	
 <p>
-	adapt_return_from_problemJWT: |$adapt_call_return_problemJWT| <br/>
 	adapt_return_from_answerJWT:  |$adapt_call_return_answerJWT| <br/>
 
 

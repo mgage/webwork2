@@ -288,8 +288,8 @@ sub formatRenderedProblem {
 	my $psvn             =  $self->{inputs_ref}->{psvn}//54321;
 	my $session_key      =  $rh_result->{session_key}//'';
 	my $displayMode      =  $self->{inputs_ref}->{displayMode};
-	my $problemJWT       = ($self->{inputs_ref}->{problemJWT})//'undefined in webworkclient->inputs_ref';
-	my $problemJWT_payload      = ($self->{inputs_ref}->{problemJWT_payload})//'undefined in webworkclient->inputs_ref';
+	my $problemJWT       = ($self->{inputs_ref}->{problemJWT});
+	my $problemJWT_payload      = ($self->{inputs_ref}->{problemJWT_payload});
 	# DEBUG
 	my $inputs_ref = $self->{inputs_ref}//'inputs ref not defined in FormatRenderer';
 
@@ -503,7 +503,8 @@ EOS
 	  return $json_output_data;
 	}
 	
-##### The libretexts format also requires special preparation.  We need to create an
+##### The libretexts format also requires special preparation if it is called with a problemJWT.
+#####  We need to create an
 ##### answerJWT+ 
 
 my($answerTemplate_hash, $JSONanswerTemplate, $answerJWT_hash,
@@ -513,36 +514,31 @@ my($answerTemplate_hash, $JSONanswerTemplate, $answerJWT_hash,
 );
 # these need to be declared outside the if block
 if ($format_name eq 'libretexts') {
-	 $answerTemplate_hash= pretty_print($tbl->answerTemplate_hash ); #$tbl->answerTemplate_hash;
-	 $JSONanswerTemplate = $tbl -> JSONanswerTemplate;
-	 $answerJWT_hash = {
-		score => $tbl->answerTemplate_hash, #$JSONanswerTemplate,
-		problemJWT => $problemJWT,
-	};
-		
-			# transfer credentials from payload
-	foreach my $key (qw(name exp iat nbf iss sub prv jti )) {
-		$answerJWT_hash->{$key} = $problemJWT_payload->{$key}//'';
+	if ($problemJWT) {
+		$answerTemplate_hash= pretty_print($tbl->answerTemplate_hash ); #$tbl->answerTemplate_hash;
+		$JSONanswerTemplate = $tbl -> JSONanswerTemplate;
+		$answerJWT_hash = {
+			score => $tbl->answerTemplate_hash, #$JSONanswerTemplate,
+			problemJWT => $problemJWT,
+		};
+
+		# transfer credentials from payload
+		foreach my $key (qw(name exp iat nbf iss sub prv jti )) {
+			$answerJWT_hash->{$key} = $problemJWT_payload->{$key}//'';
+		}
+
+		##### sessionJWT
+		$sessionJWT_hash = {answersSubmitted=>1};
+		$sessionJWT  = encode_jwt( payload =>$sessionJWT_hash, alg=>"HS256", key=>"webwork");
+		$answerJWT_hash->{sessionJWT}=$sessionJWT;
+
+		$answerJWT  = encode_jwt( payload =>$answerJWT_hash, alg=>"HS256", key=>"webwork");
+
+		$decode_problemJWT = pretty_print(jwt2hash(token=>$problemJWT,key=>'webwork'));
+ 		$decode_answerJWT = pretty_print(jwt2hash(token=>$answerJWT,key=>'webwork'));
+ 		$decode_sessionJWT = pretty_print(jwt2hash(token=>$sessionJWT,key=>'webwork'));
+ 		$adapt_call_return_answerJWT = post_to_ADAPT($answerJWT);
 	}
-
-##### sessionJWT
-	$sessionJWT_hash = {answersSubmitted=>1};
-	$sessionJWT  = encode_jwt( payload =>$sessionJWT_hash, alg=>"HS256", key=>"webwork");
-	$answerJWT_hash->{sessionJWT}=$sessionJWT;
-	
-	$answerJWT  = encode_jwt( payload =>$answerJWT_hash, alg=>"HS256", key=>"webwork");
-
-
-
-
-
-
-
-	$decode_problemJWT = pretty_print(jwt2hash(token=>$problemJWT,key=>'webwork'));
-	$decode_answerJWT = pretty_print(jwt2hash(token=>$answerJWT,key=>'webwork'));
-	$decode_sessionJWT = pretty_print(jwt2hash(token=>$sessionJWT,key=>'webwork'));
-	# $adapt_call_return_problemJWT = post_to_ADAPT($problemJWT);
-	$adapt_call_return_answerJWT = post_to_ADAPT($answerJWT);
 }
  
 # all other formats except for json_format

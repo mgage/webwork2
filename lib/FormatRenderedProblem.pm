@@ -267,7 +267,7 @@ sub formatRenderedProblem {
 	# is an internal requests that originates inside the container 
 	# targeted to another endpoint in the container
 	#################################################
-	my $forcePortNumber = ($self->{inputs_ref}->{forcePortNumber})//$ENV{WEBWORK2_HTTP_PORT_ON_HOST}//80;
+	my $forcePortNumber = ($self->{inputs_ref}->{forcePortNumber})//$ENV{WEBWORK2_HTTP_PORT_ON_HOST}//''; # (80 or 443)
 	if ( $forcePortNumber =~ /^[0-9]+$/ ) {
 	  $forcePortNumber = 0 + $forcePortNumber;
 	  if ( ! ( $SITE_URL =~ /:${forcePortNumber}/ ) ) {

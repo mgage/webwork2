@@ -62,7 +62,7 @@ eval {
 
 
 our %imagesModeOptions = %{$seed_ce->{pg}->{displayModeOptions}->{images}};
-our $site_url = $seed_ce->{server_root_url}//'';
+our $site_url = $ENV{WEBWORK_ROOT_URL}//$seed_ce->{server_root_url}//'';
 
 our $curlCommand = $seed_ce->{externalPrograms}->{curl};
 
@@ -81,7 +81,8 @@ our $imgGen = WeBWorK::PG::ImageGenerator->new(
 warn "image Generator is $imgGen";
 
 # constructor for FormatRenderedProblem object 
-# this is not used when WebworkClient and FormatRenderedProblem are combined
+# this is NOT used when WebworkClient and FormatRenderedProblem are combined
+# WebworkClient ducktypes as a FormatRenderedProblem object --sort of -- needs work
 # I think it is used in the "standalone server version"
 
 sub new {
@@ -91,7 +92,7 @@ sub new {
 		return_object   => {},
 		encoded_source  => {},
 		sourceFilePath  => '',
-		site_url        => 'https://demo.webwork.rochester.edu',
+		site_url        => '',
 		form_action_url =>'',
 		maketext        => sub {return @_}, 
 		courseID        => 'daemon_course',  # optional?
@@ -255,14 +256,18 @@ sub formatRenderedProblem {
 	# SITE_URL is where the requests for auxiliary files, html, png are directed to
 	# FORM_ACTION_URL is where a problem is sent when it is submitted for scoring.
 	
-	my $SITE_URL         =	$self->{url}//'';
+	my $SITE_URL         =	$site_url//''; #$self->{url} or $self->{site_url}??
 	my $FORM_ACTION_URL  =  $self->{form_action_url}//'';
 
 	#################################################
 	# Local docker usage with a port number sometimes misbehaves if the port number
 	# is not forced into $SITE_URL and $FORM_ACTION_URL
+	# for example: requests from a browser outside the container require port 8080
+	# requests from the webwork server to the webservice require port 80 because it 
+	# is an internal requests that originates inside the container 
+	# targeted to another endpoint in the container
 	#################################################
-	my $forcePortNumber = ($self->{inputs_ref}->{forcePortNumber})//'';
+	my $forcePortNumber = ($self->{inputs_ref}->{forcePortNumber})//$ENV{WEBWORK2_HTTP_PORT_ON_HOST}//80;
 	if ( $forcePortNumber =~ /^[0-9]+$/ ) {
 	  $forcePortNumber = 0 + $forcePortNumber;
 	  if ( ! ( $SITE_URL =~ /:${forcePortNumber}/ ) ) {

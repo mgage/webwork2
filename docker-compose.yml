@@ -151,6 +151,7 @@ services:
       # These are set in the .env file and import values from there
       WEBWORK_DB_PASSWORD: ${WEBWORK_DB_PASSWORD}
       WEBWORK_DB_USER: ${WEBWORK_DB_USER}
+      WEBWORK2_HTTP_PORT_ON_HOST: ${WEBWORK2_HTTP_PORT_ON_HOST}
 
       # =======================================================
       # Local configuration variables:

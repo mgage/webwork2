@@ -187,7 +187,7 @@ sub new {   #WebworkClient constructor
 			AnSwEr0002 => '',
 			AnSwEr0003 => '',
 			displayMode     => 'no displayMode defined',
-			forcePortNumber => '',
+			forcePortNumber => $ENV{WEBWORK2_HTTP_PORT_ON_HOST},  #for docker containers
 			internal_WW2_secret => 'BAD',
 		},
 		@_,               # options and overloads

@@ -1,7 +1,3 @@
-# put a command here?
-
-# don't use my here?
-
 
 
 my $libretexts_format = <<'ENDPROBLEMTEMPLATE';
@@ -81,11 +77,16 @@ $problemHeadText
 
 
 	</p>
-	<p> <!-- answerTemplate_hash:  $answerTemplate_hash;<br/> -->
+	<p> 
         JSONanswerTemplate: $JSONanswerTemplate<br/>
-        </p>
+    </p>
         
-    site_url (for images and other auxiliary files) is: |$SITE_URL| FORM_ACTION_URL (to submit for scoring) is |$FORM_ACTION_URL|
+   <p>URLS<BR/>
+    site_url (for images and other auxiliary files) is: |$SITE_URL| <BR/>
+    FORM_ACTION_URL (to submit for scoring) is |$FORM_ACTION_URL|<BR/>
+    docker container: WEBWORK2_HTTP_PORT_ON_HOST: $ENV{WEBWORK2_HTTP_PORT_ON_HOST}<BR/>
+
+   </p>
 </div>
 
 

@@ -252,8 +252,10 @@ sub formatRenderedProblem {
 	$self->{outputformats}={};
 	
 	# prepare constants to be interpolated into the _formats files
+	# SITE_URL is where the requests for auxiliary files, html, png are directed to
+	# FORM_ACTION_URL is where a problem is sent when it is submitted for scoring.
 	
-	my $SITE_URL         =	'localhost'; #'$self->site_url//'';
+	my $SITE_URL         =	$self->{url}//'';
 	my $FORM_ACTION_URL  =  $self->{form_action_url}//'';
 
 	#################################################

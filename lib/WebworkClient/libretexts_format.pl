@@ -48,7 +48,7 @@ $problemHeadText
 <div class="container-fluid">
 <div class="row-fluid">
 <div class="span12 problem">
-<div style="">
+<div id="debug-display" style="">
 	<h3> Curl call </h3>
 
 <p>
@@ -86,7 +86,7 @@ $problemHeadText
         JSONanswerTemplate: $JSONanswerTemplate<br/>
         </p>
         
-    site url is: |$SITE_URL|
+    site_url (for images and other auxiliary files) is: |$SITE_URL| FORM_ACTION_URL (to submit for scoring) is |$FORM_ACTION_URL|
 </div>
 
 

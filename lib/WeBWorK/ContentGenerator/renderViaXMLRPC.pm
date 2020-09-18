@@ -124,7 +124,7 @@ our ($WEBSERVICE_SITE_URL,$FORM_ACTION_URL, $XML_PASSWORD, $XML_COURSE);
 
 
 
-	$WEBSERVICE_SITE_URL =  "http://localhost"; #"$server_root_url"; #includes port (which is :80 within the container)
+	$WEBSERVICE_SITE_URL =  "$server_root_url"; #includes port (which is :80 within the container)
 	$FORM_ACTION_URL     =  "http://localhost:8080/webwork2/html2xml"; #includes exterior port provided by the container
 
 

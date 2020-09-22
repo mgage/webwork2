@@ -72,7 +72,7 @@ use Carp;
 #     reorganizes the XML it receives into an HTML page (with a WeBWorK form) and 
 #     pipes it through a local browser.
 #
-#     The browser uses this url to resubmit the problem (with answers) via the standard
+#     The browser uses the form action url to resubmit the problem (with answers) via the standard
 #     HTML webform used by WeBWorK to the renderViaXMLRPC.pm handler.  
 #
 #     This renderViaXMLRPC.pm handler acts as an intermediary between the browser 
@@ -84,18 +84,19 @@ use Carp;
 #     submitted directly by the browser.  
 #     The renderViaXMLRPC.pm translates the WeBWorK form, has it processes by the webservice
 #     and returns the result to the browser. 
-#     The The client renderProblem.pl script is no longer involved.
-# 4.  Summary: renderProblem.pl is only involved in the first round trip
+#     The The client sendXMLRPC.pl script is no longer involved.
+# 4.  Summary: sendXMLRPC.pl is only involved in the first round trip
 #     of the submitted problem.  After that the communication is  between the browser and
 #     renderViaXMLRPC using HTML forms and between renderViaXMLRPC and the WebworkWebservice.pm
 #     module using XML_RPC.
+# 5.  Andrew Parker has set up a more efficient workflow which eliminates the XMLRPC transport all 
+#     together and uses Mojolicious to wrap the PG rendering code.
 
 
 # Determine the root directory for webwork on this machine (e.g. /opt/webwork/webwork2 )
 # this is set in webwork.apache2-config
 # it specifies the address of the webwork root directory
 
-#my $webwork_dir  = $ENV{WEBWORK_ROOT};
 my $webwork_dir  = $WeBWorK::Constants::WEBWORK_DIRECTORY;
 unless ($webwork_dir) {
 	die "renderViaXMLRPC.pm requires that the top WeBWorK directory be set in ".
@@ -153,6 +154,7 @@ sub pre_header_initialize {
 	#         -- the rendering course (daemon_course) is a standard WW course but for safety 
 	#         -- it should not have many users enrolled besides "daemon"
 	
+	# FIXME  a better name for hash_from_web_form would be web_form_hash or html2xml_web_form_hash
 	# When passing parameters via an LMS you get "custom_" put in front of them. So lets
 	
 
@@ -173,9 +175,15 @@ sub pre_header_initialize {
 
 
 	# some additional override operations are done if there is a JSONWebToken (JWT) present
+	
+	# create a $ce from $r to configure the JWT
+	# new JWT_manager? JWT_util?   
 	my $problemJWT  = $hash_from_web_form{problemJWT}//'';
 	if ($problemJWT) { #take all data from the problemJWT_payload
 		my $problemJWT_payload = decode_jwt(token=>$problemJWT, key=>'webwork', accepted_alg=>'HS256'); # TODO REMOVE INSECURE DEVELOPMENT KEY
+		
+		# verify integrity of JWT
+		
 		unless ($problemJWT_payload->{webwork}) {
 			croak("problemJWT does not contain 'webwork' field in problemJWT_payload");
 		}
@@ -189,7 +197,7 @@ sub pre_header_initialize {
 		# verify_nbf=>1, 
 		# verify_exp=>1, 
 		# verify_aud=>"webwork", 
-		# verify_iss=>""
+		# verify_iss=>"adapt"
 		#TODO switch to asymmetric keys and JWT encrpytion [JSON Web Encryption (JWE)].
 
 	   # get sessionJWT (anything else you want preserved)
@@ -197,13 +205,12 @@ sub pre_header_initialize {
 		my $sessionJWT  = $hash_from_web_form{sessionJWT}//'';
 		
 		# erase hash_from_web_form and reload
-		#%hash_from_web_form=(); # overwrite instead of erasing
+		#%hash_from_web_form=(); # overwrite instead 
+		# of erasing since  submittedAnswers status changes
+		# once sessionJWT is working properly you might be able to erase all input to prevent spoofing
 	
-		$hash_from_web_form{problemJWT}= $problemJWT;
-		
-	
-		warn "\nproblemJWT  $problemJWT\n\n"; 
-		warn "problemJWT_payload $problemJWT_payload \n";
+		# warn "\nproblemJWT  $problemJWT\n\n"; 
+		# warn "problemJWT_payload $problemJWT_payload \n";
 		foreach my $key (qw(submittedAnswers course_password courseID displayMode 
 		                language outputformat problemSeed problemSeed problemUUID 
 		                showSummary sourceFilePath userID 
@@ -211,7 +218,7 @@ sub pre_header_initialize {
 		            ) {
 					$hash_from_web_form{$key} = $problemJWT_payload->{webwork}{$key}; 
 		}
-		$hash_from_web_form{problemJWT}= $problemJWT;  # stable the original JWT to problemJWT_payload	
+		$hash_from_web_form{problemJWT}= $problemJWT;  # staple the original JWT to problemJWT_payload	
 		$hash_from_web_form{problemJWT_payload}=$problemJWT_payload;
 		# set state
 		if ($sessionJWT)   {
@@ -301,6 +308,8 @@ sub pre_header_initialize {
 	$xmlrpc_client->{inputs_ref}      = \%hash_from_web_form;  # contains GET parameters from form
     #FIXME need new name for inputs_ref
 
+	# provision xmlrpc_client with a JWT_Util object (hasa capability to handle JWT)
+	# $xmlrpc_client->{JWT_Util}= 
 	##############################
 	# xmlrpc_client calls webservice via
 	# xmlrpcCall() to have problem rendered by WebworkWebservice::RenderProblem.pl

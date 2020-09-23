@@ -176,7 +176,7 @@ sub new {
 	    displayMode 		=> $options{displayMode} || "MathJax",
 		showHeadline        => $options{showHeadline} // 1,
 	    showAnswerNumbers    => $options{showAnswerNumbers}//1,
-	    showAttemptAnswers =>  $options{showAttemptAnswers}//1,    # show student answer as entered and simplified 
+	    showAttemptAnswers  =>  $options{showAttemptAnswers}//1,    # show student answer as entered and simplified 
 	                                                               #  (e.g numerical formulas are calculated to produce numbers)
 	    showAttemptPreviews => $options{showAttemptPreviews}//1,   # show preview of student answer
 	    showAttemptResults 	=> $options{showAttemptResults}//1,    # show whether student answer is correct
@@ -351,7 +351,7 @@ sub make_answer_template {
 
 sub make_JSON_JWT_answer_templates {
 	my $self = shift;
-	return unless 
+	#return unless # what is this?
 	my $rh_answers = $self->{answers};
 	my $answerTemplate_hash={};
 	return "" unless $self->answersSubmitted; # only print if there is at least one non-blank answer

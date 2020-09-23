@@ -292,6 +292,8 @@ sub formatRenderedProblem {
 	my $problemJWT_payload      = ($self->{inputs_ref}->{problemJWT_payload});
 	# DEBUG
 	my $inputs_ref = $self->{inputs_ref}//'inputs ref not defined in FormatRenderer';
+	
+	my $jwt_tool = $self->{jwt_tool};
 
 	my $previewMode      =  defined($self->{inputs_ref}->{preview})||0;
 	my $checkMode        =  defined($self->{inputs_ref}->{WWcheck})||0; #not yet used
@@ -529,15 +531,15 @@ if ($format_name eq 'libretexts') {
 
 		##### sessionJWT
 		$sessionJWT_hash = {answersSubmitted=>1};
-		$sessionJWT  = encode_jwt( payload =>$sessionJWT_hash, alg=>"HS256", key=>"webwork");
+		$sessionJWT  = $jwt_tool->hash2jwt($sessionJWT_hash);
 		$answerJWT_hash->{sessionJWT}=$sessionJWT;
 
-		$answerJWT  = encode_jwt( payload =>$answerJWT_hash, alg=>"HS256", key=>"webwork");
+		$answerJWT  = $jwt_tool->hash2jwt($answerJWT_hash);
 
-		$decode_problemJWT = pretty_print(jwt2hash(token=>$problemJWT,key=>'webwork'));
- 		$decode_answerJWT = pretty_print(jwt2hash(token=>$answerJWT,key=>'webwork'));
- 		$decode_sessionJWT = pretty_print(jwt2hash(token=>$sessionJWT,key=>'webwork'));
- 		$adapt_call_return_answerJWT = post_to_ADAPT($answerJWT);
+		$decode_problemJWT = pretty_print($jwt_tool->jwt2hash($problemJWT));
+ 		$decode_answerJWT = pretty_print($jwt_tool->jwt2hash($answerJWT));
+ 		$decode_sessionJWT = pretty_print($jwt_tool->jwt2hash($sessionJWT));
+ 		$adapt_call_return_answerJWT = WeBWorK::Utils::JWT_Utils::post_to_ADAPT($answerJWT);
 	}
 }
  

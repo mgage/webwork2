@@ -40,6 +40,7 @@ use CGI;
 use JSON;
 use Crypt::JWT qw( decode_jwt encode_jwt);
 use Carp;
+use WeBWorK::Utils::JWT_Utils;
 
 =head1 Description
 
@@ -178,9 +179,13 @@ sub pre_header_initialize {
 	
 	# create a $ce from $r to configure the JWT
 	# new JWT_manager? JWT_util?   
+	my $jwt_tool = WeBWorK::Utils::JWT_Utils->new( {
+		ce => $r->{ce},
+	    # more initialization should follow.
+	});
 	my $problemJWT  = $hash_from_web_form{problemJWT}//'';
 	if ($problemJWT) { #take all data from the problemJWT_payload
-		my $problemJWT_payload = decode_jwt(token=>$problemJWT, key=>'webwork', accepted_alg=>'HS256'); # TODO REMOVE INSECURE DEVELOPMENT KEY
+		my $problemJWT_payload = $jwt_tool->jwt2hash($problemJWT); # TODO REMOVE INSECURE DEVELOPMENT KEY
 		
 		# verify integrity of JWT
 		
@@ -224,7 +229,7 @@ sub pre_header_initialize {
 		if ($sessionJWT)   {
 		warn "\n\n\n sessionJWT  $sessionJWT\n\n"; 
 	
-			my $sessionJWT_payload = decode_jwt(token=>$sessionJWT, key=>'webwork', accepted_alg=>'HS256'); # TODO REMOVE INSECURE DEVELOPMENT KEY
+			my $sessionJWT_payload = $jwt_tool->jwt2hash($sessionJWT, accepted_alg=>'HS256'); 
 			warn "sessionJWT_payload $sessionJWT_payload \n";
 			#update hash variables from sessionState
 			#  qw(answersSubmitted problemSource session_key )
@@ -252,7 +257,7 @@ sub pre_header_initialize {
 					"sourceFilePath: |$hash_from_web_form{sourceFilePath}|",
 					"displayMode: |$hash_from_web_form{displayMode}|",
 					"problemSeed: |$hash_from_web_form{problemSeed}|",
-					"problemJWT_payload: |",encode_json($hash_from_web_form{problemJWT_payload}),"|",
+					"problemJWT_payload: |", hash2json($hash_from_web_form{problemJWT_payload}),"|",
 				  ])
 				  )
 			);
@@ -306,6 +311,7 @@ sub pre_header_initialize {
 	$xmlrpc_client->{problemJWT}     = $hash_from_web_form{problemJWT}//'not defined in webwork hash'; 
 	# in addition to the arguments above the hash_from_web_form contains parameters for the pg_environment
 	$xmlrpc_client->{inputs_ref}      = \%hash_from_web_form;  # contains GET parameters from form
+	$xmlrpc_client->{jwt_tool}        = $jwt_tool;
     #FIXME need new name for inputs_ref
 
 	# provision xmlrpc_client with a JWT_Util object (hasa capability to handle JWT)

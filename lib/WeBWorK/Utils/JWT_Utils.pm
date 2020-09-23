@@ -1,5 +1,5 @@
 
-package WeBWorK::Utils::JWT_utils;
+package WeBWorK::Utils::JWT_Utils;
 use base qw(Class::Accessor);
 
 use 5.10.0;
@@ -27,7 +27,9 @@ our @EXPORT_OK = qw(
 
 sub new {
 	my $class = shift;
-	my %options = @_;
+	$class = (ref($class))? ref($class) : $class; # create a new object of the same class
+
+	my @options = @_;  #FIXME figure out how options should be passed in
 	$class = (ref($class))? ref($class) : $class; # create a new object of the same class
 	my $ce = shift;  # grab a course environment variable
 	my $self = {
@@ -37,11 +39,12 @@ sub new {
 		content_alg =>''  , # the algorithm for encrypting the content_alg
 		signing_alg =>'HS256'   , # the algorithm for signing (encrypting the signature)
 		elapsed_time=>0,    # iat to exp
+		@options,
 	};
 	bless $self, $class;
 	# create accessors/mutators
     $self->mk_ro_accessors (qw( ce path_to_config_file secret_key content_alg signing_alg elapsed_time));
-	_init($self, %options);  #go grab data from the configuration file
+	_init($self, @options);  #go grab data from the configuration file
 	return $self;
 }
 
@@ -101,6 +104,7 @@ sub hash2jwt {
 	encode_jwt(payload=>$payload, alg=> $self->signing_alg ,key => $self->secret_key );
 }
 
+# subroutines not methods
 sub json2hash {
 	decode_json(shift);
 }

@@ -365,8 +365,8 @@ sub make_JSON_JWT_answer_templates {
  							 };
 	}
 	$self->{answerTemplate_hash}= $answerTemplate_hash;
-	$self->{JSONanswerTemplate} = encode_json $answerTemplate_hash;
-	$self->{JWTanswerTemplate}  = encode_jwt( payload =>$answerTemplate_hash, alg=>"HS256", key=>"s1r1b1r1");
+	#$self->{JSONanswerTemplate} = encode_json $answerTemplate_hash;
+	#$self->{JWTanswerTemplate}  = encode_jwt( payload =>$answerTemplate_hash, alg=>"HS256", key=>"s1r1b1r1");
 }
 
 #################################################

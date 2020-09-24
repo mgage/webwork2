@@ -512,15 +512,16 @@ EOS
 my($answerTemplate_hash, $JSONanswerTemplate, $answerJWT_hash,
 	$sessionJWT_hash, $decode_problemJWT, 
 	$decode_answerJWT,
-	$adapt_call_return_problemJWT,$adapt_call_return_answerJWT
+	$adapt_call_return_problemJWT,$adapt_call_return_answerJWT, $pp_problemResult, 
+	$pp_problemState, $adapt_json_response_str
 );
 # these need to be declared outside the if block
 if ($format_name eq 'libretexts') {
 	if ($problemJWT) {
 		$answerTemplate_hash= pretty_print($tbl->answerTemplate_hash ); #$tbl->answerTemplate_hash;
-		$JSONanswerTemplate = $tbl -> JSONanswerTemplate;
+		#$JSONanswerTemplate = $tbl -> JSONanswerTemplate;
 		$answerJWT_hash = {
-			score => $tbl->answerTemplate_hash, #$JSONanswerTemplate,
+			score => $problemResult, #$JSONanswerTemplate,
 			problemJWT => $problemJWT,
 		};
 
@@ -530,7 +531,7 @@ if ($format_name eq 'libretexts') {
 		}
 
 		##### sessionJWT
-		$sessionJWT_hash = {answersSubmitted=>1};
+		$sessionJWT_hash = {answerTemplate=>($tbl->answerTemplate_hash), answersSubmitted=>1};
 		$sessionJWT  = $jwt_tool->hash2jwt($sessionJWT_hash);
 		$answerJWT_hash->{sessionJWT}=$sessionJWT;
 
@@ -539,7 +540,11 @@ if ($format_name eq 'libretexts') {
 		$decode_problemJWT = pretty_print($jwt_tool->jwt2hash($problemJWT));
  		$decode_answerJWT = pretty_print($jwt_tool->jwt2hash($answerJWT));
  		$decode_sessionJWT = pretty_print($jwt_tool->jwt2hash($sessionJWT));
- 		$adapt_call_return_answerJWT = WeBWorK::Utils::JWT_Utils::post_to_ADAPT($answerJWT);
+ 		$pp_problemResult = pretty_print($problemResult);
+ 		$pp_problemState  = pretty_print($problemState);
+ 		$adapt_json_response_obj = WeBWorK::Utils::JWT_Utils::post_to_ADAPT($answerJWT); # ( json obj)
+# 		$adapt_response_hash_rh = decode_json($adapt_json_response_obj); #not used
+ 		$adapt_call_return_answerJWT = pretty_print( decode_json( $adapt_json_response_obj ));
 	}
 }
  

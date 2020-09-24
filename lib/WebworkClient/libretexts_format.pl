@@ -87,6 +87,13 @@ $problemHeadText
     docker container: WEBWORK2_HTTP_PORT_ON_HOST: $ENV{WEBWORK2_HTTP_PORT_ON_HOST}<BR/>
 
    </p>
+   
+   <p>
+     problemResult = $pp_problemResult
+   </p>
+   <p>
+     problemState = $pp_problemState
+   </p>
 </div>
 
 
@@ -160,6 +167,18 @@ WeBWorK &copy; 1996-2020 | host: $SITE_URL | course: $courseID | format: librete
 
 <!-- Activate local storage js -->
 <script type="text/javascript">WWLocalStorage();</script>
+<script type="text/javascript">
+var response =$adapt_json_response_obj;
+var returnobj = {
+    subject: "webwork.result",
+    message: response.message,
+    type: response.type
+};
+window.parent.postMessage(JSON.stringify(returnobj), '*');
+
+window.alert("response message " + JSON.stringify(returnobj));
+
+</script>
 </body>
 </html>
 

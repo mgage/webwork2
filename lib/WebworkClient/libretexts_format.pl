@@ -176,7 +176,7 @@ var returnobj = {
 };
 window.parent.postMessage(JSON.stringify(returnobj), '*');
 
-window.alert("response message " + JSON.stringify(returnobj));
+//window.alert("response message " + JSON.stringify(returnobj));
 
 </script>
 </body>

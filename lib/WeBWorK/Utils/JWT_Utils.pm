@@ -59,7 +59,7 @@ sub post_to_ADAPT {
 	my $jwt_to_post = shift;
 	my $ua = LWP::UserAgent->new( 'send_te' => '0' );
 	my $r  = HTTP::Request->new(
-		'POST' => 'https://dev.adapt.libretexts.org/api/jwt-test',
+		'POST' => 'https://dev.adapt.libretexts.org/api/jwt/process-answer-jwt',
 		[
 			'Accept' => 'application/json',
 			'Authorization' => "Bearer  $jwt_to_post",
@@ -76,7 +76,7 @@ sub post_to_ADAPT {
 	 }
 	 else {
 	 	if ($adapt_call_hash->{_rc}==200){
-	 		return "ok".$adapt_call_hash->{_content}
+	 		return $adapt_call_hash->{_content}
 	 	}
 	 	else {
 	 		return "not_ok".$adapt_call_hash->{_rc}

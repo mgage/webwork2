@@ -74,12 +74,12 @@ sub post_to_ADAPT {
 		warn "problem with curl call $@";
 		return $@;
 	 }
-	 else {
+	 else { #FIXME make catching error more robust
 	 	if ($adapt_call_hash->{_rc}==200){
 	 		return $adapt_call_hash->{_content}
 	 	}
 	 	else {
-	 		return "not_ok".$adapt_call_hash->{_rc}
+	 		return $adapt_call_hash->{_rc}
 	 	}
 	 }
 # other fields returned in this hash -- possibly useful for debugging

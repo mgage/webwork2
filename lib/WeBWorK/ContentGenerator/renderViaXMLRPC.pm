@@ -218,7 +218,7 @@ sub pre_header_initialize {
 		# warn "problemJWT_payload $problemJWT_payload \n";
 		foreach my $key (qw(submittedAnswers course_password courseID displayMode 
 		                language outputformat problemSeed problemSeed problemUUID 
-		                showSummary sourceFilePath userID 
+		                showCorrectButton showDebug showSubmitButton showSummary sourceFilePath userID 
 						)
 		            ) {
 					$hash_from_web_form{$key} = $problemJWT_payload->{webwork}{$key}; 

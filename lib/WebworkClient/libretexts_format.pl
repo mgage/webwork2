@@ -44,7 +44,7 @@ $problemHeadText
 <div class="container-fluid">
 <div class="row-fluid">
 <div class="span12 problem">
-<div id="debug-display" style="">
+<div id="debug-display" style="$displayDebugDiv">
 	<h3> Curl call </h3>
 
 <p>
@@ -137,9 +137,9 @@ $LTIGradeMessage
 <input type="hidden" name="problemJWT" value="$problemJWT">
 <input type="hidden" name="sessionJWT" value="$sessionJWT">
 <p>
-<input type="submit" name="preview"  value="$STRING_Preview" />
-<input type="submit" name="WWsubmit" value="$STRING_Submit"/>
-<input type="submit" name="WWcorrectAns" value="$STRING_ShowCorrect"/>
+
+$previewButtonHTML  $submitButtonHTML  $showCorrectButtonHTML
+
 </p>
 </form>
 </div>
@@ -167,6 +167,7 @@ WeBWorK &copy; 1996-2020 | host: $SITE_URL | course: $courseID | format: librete
 
 <!-- Activate local storage js -->
 <script type="text/javascript">WWLocalStorage();</script>
+
 <script type="text/javascript">
 var response =$adapt_json_response_obj;
 var returnobj = {

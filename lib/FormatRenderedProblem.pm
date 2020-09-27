@@ -287,18 +287,20 @@ sub formatRenderedProblem {
 	my $problemSeed      =  $self->{inputs_ref}->{problemSeed}//6666;
 	my $psvn             =  $self->{inputs_ref}->{psvn}//54321;
 	my $session_key      =  $rh_result->{session_key}//'';
-	my $displayMode      =  $self->{inputs_ref}->{displayMode};
-	my $problemJWT       = ($self->{inputs_ref}->{problemJWT});
-	my $problemJWT_payload      = ($self->{inputs_ref}->{problemJWT_payload});
+	my $displayMode      =  $self->{inputs_ref}->{displayMode}//'mathjax';
+	my $problemJWT       = ($self->{inputs_ref}->{problemJWT})//'';
+	my $problemJWT_payload      = ($self->{inputs_ref}->{problemJWT_payload})//{};
+	my $displayDebugDiv         = ($self->{inputs_ref}->{showDebug})?' ':'display:none'; 
+	                       #(display debug div -- default is display:none)
 	# DEBUG
 	my $inputs_ref = $self->{inputs_ref}//'inputs ref not defined in FormatRenderer';
 	
 	my $jwt_tool = $self->{jwt_tool};
 
-	my $previewMode      =  defined($self->{inputs_ref}->{preview})||0;
-	my $checkMode        =  defined($self->{inputs_ref}->{WWcheck})||0; #not yet used
-	my $submitMode       =  defined($self->{inputs_ref}->{WWsubmit})||0;
-	my $showCorrectMode  =  defined($self->{inputs_ref}->{WWcorrectAns})||0;
+	my $previewMode      =  defined($self->{inputs_ref}->{WWpreview})||0;
+	my $checkMode        =  ($self->{inputs_ref}->{WWcheck})//0; #not yet used
+	my $submitMode       =  ($self->{inputs_ref}->{WWsubmit})//0;
+	my $showCorrectMode  =  ($self->{inputs_ref}->{WWcorrectAns})//0;
 	# problemUUID can be added to the request as a parameter.  
 	# It adds a prefix to the 
 	# identifier used by the  format so that several different problems
@@ -331,11 +333,6 @@ sub formatRenderedProblem {
 	my $color_input_blanks_script = $tbl->color_answer_blanks;
 	$tbl->imgGen->render(refresh => 1) if $tbl->displayMode eq 'images';
 	
-
-	# warn "imgGen is ", $tbl->imgGen;
-	#warn "answerOrder ", $tbl->answerOrder;
-	#warn "answersSubmitted ", $tbl->answersSubmitted;
-	# render equation images
 
 	my $mt = WeBWorK::Localize::getLangHandle($formLanguage//'en');
 
@@ -464,8 +461,21 @@ EOS
 	my $STRING_Preview     = $mt->maketext("Preview My Answers");
 	my $STRING_ShowCorrect = $mt->maketext("Show correct answers");
 	my $STRING_Submit      = $mt->maketext("Check Answers");
+	
+	# set up html display for preview, submit and checkAnswer buttons
+	my $showPreviewButton = ($self->{inputs_ref}->{showPreviewButton})//1;
+	my $showSubmitButton  = ($self->{inputs_ref}->{showSubmitButton})//1;
+	my $showCorrectButton = ($self->{inputs_ref}->{showCorrectButton})//0;
+	
+	my $previewButtonHTML    = ($showPreviewButton)?
+		qq{<input type="submit" name="WWpreview"  value="$STRING_Preview" />}: ' ';
+	my $submitButtonHTML     = ($showSubmitButton)?
+		qq{<input type="submit" name="WWsubmit" value="$STRING_Submit"/>}: ' ';
+	my $showCorrectButtonHTML   = ($showCorrectButton)?
+		qq{<input type="submit" name="WWcorrectAns" value="$STRING_ShowCorrect"/>}: ' ';
+	
     #DEBUG FIXME
-    my $display_self ="display_self".join(" | ", %{$self->{inputs_ref}});
+    #my $display_self ="display_self".join(" | ", %{$self->{inputs_ref}});
 ######################################################
 # Return interpolated problem template
 ######################################################
@@ -531,7 +541,9 @@ if ($format_name eq 'libretexts') {
 		}
 
 		##### sessionJWT
-		$sessionJWT_hash = {answerTemplate=>($tbl->answerTemplate_hash), answersSubmitted=>1};
+		$sessionJWT_hash={};
+		$sessionJWT_hash ->{answerTemplate}=$tbl->answerTemplate_hash;
+		$sessionJWT_hash ->{answersSubmitted}=1;
 		$sessionJWT  = $jwt_tool->hash2jwt($sessionJWT_hash);
 		$answerJWT_hash->{sessionJWT}=$sessionJWT;
 
@@ -544,7 +556,7 @@ if ($format_name eq 'libretexts') {
  		$pp_problemState  = pretty_print($problemState);
  		$adapt_json_response_obj = WeBWorK::Utils::JWT_Utils::post_to_ADAPT($answerJWT); # ( json obj)
 # 		$adapt_response_hash_rh = decode_json($adapt_json_response_obj); #not used
- 		$adapt_call_return_answerJWT = pretty_print( decode_json( $adapt_json_response_obj ));
+ 		$adapt_call_return_answerJWT = $adapt_json_response_obj;
 	}
 }
  

@@ -201,7 +201,7 @@ our $result;
 
 ##################################################
 # Utilities -- 
-#    this code is identical between renderProblem.pl and renderViaXMLRPC.pm
+#    this code is identical between sendXMLRPC.pl and renderViaXMLRPC.pm
 ##################################################
 
 =head2 xmlrpcCall
@@ -601,8 +601,7 @@ sub default_inputs {
 		displayMode             => $self->{displayMode},
 		modules_to_evaluate     => [@modules_to_evaluate],
 		envir                   => $self->environment(),
-		problem_state           => {
-		
+		problem_state           => {	
 			num_of_correct_ans  => 0,
 			num_of_incorrect_ans => 4,
 			recorded_score       => 1.0,
@@ -665,8 +664,8 @@ sub environment {
 		numZeroLevelDefault =>0.000001,
 		numZeroLevelTolDefault =>0.000001,
 		openDate=> '3014438528',
-		permissionLevel =>10,
-		PRINT_FILE_NAMES_FOR => [ 'gage'],
+		permissionLevel =>2,  # set to login_proctor
+		PRINT_FILE_NAMES_FOR => [ 'daemon'],
 		probFileName => 'WebworkClient.pm:: define probFileName in environment',
 		problemSeed  => $self->{inputs_ref}->{problemSeed}//3333,
 		problemUUID  => $self->{inputs_ref}->{problemUUID}//0,
@@ -686,8 +685,10 @@ sub environment {
 		templateDirectory=>'not defined',
 		tempURL=>'not defined',
 		webworkDocsURL => 'not defined',
-		showHints => 1,               # extra options -- usually passed from the input form
-		showSolutions => 1,
+		showHints => $self->{inputs_ref}->{showHints},               # extra options -- usually passed from the input form
+		showSolutions => $self->{inputs_ref}->{showSolutions},
+		#displaySolutionsQ =>1, #$self->{inputs_ref}->{showSolutions},
+		#displayHintsQ=>$self->{inputs_ref}->{showHints},
 		@_,
 	};
 	$envir;

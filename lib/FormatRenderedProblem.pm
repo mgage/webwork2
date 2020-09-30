@@ -310,6 +310,11 @@ sub formatRenderedProblem {
 	my $problemState     =  $rh_result->{problem_state}//'';
 	my $showSummary      = ($self->{inputs_ref}->{showSummary})//1; #default to show summary for the moment
 	my $scoreSummary     =  '';
+	
+	# other state variables
+	my $showHints        = $rh_result->{showHints}//'';
+	my $showSolutions    = $rh_result->{showSolutions}//'';
+	my $showDebug        = $rh_result->{showDebug}//'';
 
 
 	my $tbl = WeBWorK::Utils::AttemptsTable->new(
@@ -554,13 +559,19 @@ if ($format_name eq 'libretexts') {
  		$decode_sessionJWT = pretty_print($jwt_tool->jwt2hash($sessionJWT));
  		$pp_problemResult = pretty_print($problemResult);
  		$pp_problemState  = pretty_print($problemState);
- 		$adapt_json_response_obj = WeBWorK::Utils::JWT_Utils::post_to_ADAPT($answerJWT); # ( json obj)
-# 		$adapt_response_hash_rh = decode_json($adapt_json_response_obj); #not used
- 		$adapt_call_return_answerJWT = $adapt_json_response_obj;
+ 		my $adapt_json_response_obj={}; 
+ 		my $adapt_response_message='';
+ 		#if ($self->{inputs_ref}->{answersSubmitted}) {
+ 			 		$adapt_json_response_obj = WeBWorK::Utils::JWT_Utils::post_to_ADAPT($answerJWT); # ( json obj)
+ 			 		## FIXME -- want to be able to test the result first before acting on it. 
+ 		#}
+
+		#$adapt_response_hash_rh = decode_json($adapt_json_response_obj); #not used
+ 		my $adapt_call_return_answerJWT = join(" | ", %$adapt_json_response_obj);
 	}
 }
  
-# all other formats except for json_format
+	# all other formats except for json_format
 	# find the appropriate template in WebworkClient folder
 	my $template = do("WebworkClient/${format_name}_format.pl");
 	unless ($template) {
@@ -573,6 +584,11 @@ if ($format_name eq 'libretexts') {
 	$template =~ s/(\$\w+)/$1/gee;  
 	return $template;
 }
+
+#####################
+#UTILITY subroutines
+#####################
+
 sub pretty_print {    # provides html output -- NOT a method
     my $r_input = shift;
     my $level = shift;
@@ -611,7 +627,7 @@ sub pretty_print {    # provides html output -- NOT a method
 }
 
 
-#####################
+
 # error formatting
 sub format_hash_ref {
 	my $hash = shift;

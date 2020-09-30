@@ -73,8 +73,9 @@ $problemHeadText
 
 	
 <p>
-	adapt_return_from_answerJWT:  |$adapt_call_return_answerJWT| <br/>
+	adapt_call_return_answerJWT:  |$adapt_call_return_answerJWT| --- $adapt_json_response_obj <br/>
 
+     adapt_response_hash_rh:   |$adapt_response_hash_rh|
 
 	</p>
 	<p> 
@@ -133,6 +134,9 @@ $LTIGradeMessage
 <input type="hidden" name="outputformat" value="libretexts">
 <input type="hidden" name="language" value="$formLanguage">
 <input type="hidden" name="showSummary" value="$showSummary">
+<input type="hidden" name="showHints" value="$showHints">
+<input type="hidden" name="showSolutions" value="$showSolutions">
+<input type="hidden" name="showDebug" value="$showDebug">
 <input type="hidden" name="forcePortNumber" value="$forcePortNumber">
 <input type="hidden" name="problemJWT" value="$problemJWT">
 <input type="hidden" name="sessionJWT" value="$sessionJWT">

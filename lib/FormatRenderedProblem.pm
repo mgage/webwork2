@@ -567,7 +567,7 @@ if ($format_name eq 'libretexts') {
  		#}
 
 		#$adapt_response_hash_rh = decode_json($adapt_json_response_obj); #not used
- 		my $adapt_call_return_answerJWT = join(" | ", %$adapt_json_response_obj);
+		$adapt_call_return_answerJWT = $adapt_json_response_obj;
 	}
 }
  

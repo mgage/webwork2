@@ -180,7 +180,7 @@ var returnobj = {
     type: response.type
 };
 
-window.alert("response message " + JSON.stringify(returnobj));
+console.log("response message " + JSON.stringify(returnobj));
 
 window.parent.postMessage(JSON.stringify(returnobj), '*');
 

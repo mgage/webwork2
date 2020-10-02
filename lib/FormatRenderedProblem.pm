@@ -559,14 +559,20 @@ if ($format_name eq 'libretexts') {
  		$decode_sessionJWT = pretty_print($jwt_tool->jwt2hash($sessionJWT));
  		$pp_problemResult = pretty_print($problemResult);
  		$pp_problemState  = pretty_print($problemState);
- 		my $adapt_json_response_obj={}; 
  		my $adapt_response_message='';
- 		#if ($self->{inputs_ref}->{answersSubmitted}) {
- 			 		$adapt_json_response_obj = WeBWorK::Utils::JWT_Utils::post_to_ADAPT($answerJWT); # ( json obj)
+ 		if ($self->{inputs_ref}->{answersSubmitted}) {
+ 			 		$adapt_json_response_obj = WeBWorK::Utils::JWT_Utils::post_to_ADAPT($problemJWT, $answerJWT); # ( json obj)
  			 		## FIXME -- want to be able to test the result first before acting on it. 
- 		#}
+ 		}
 
 		#$adapt_response_hash_rh = decode_json($adapt_json_response_obj); #not used
+		if (ref($adapt_json_response_obj)=~/HASH/) {
+			$adapt_call_return_answerJWT = $adapt_json_response_obj;
+		}
+		else {
+			$adapt_call_return_answerJWT = $adapt_json_response_obj;
+		}
+		
 		$adapt_call_return_answerJWT = $adapt_json_response_obj;
 	}
 }

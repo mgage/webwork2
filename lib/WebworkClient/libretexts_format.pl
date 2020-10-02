@@ -173,17 +173,22 @@ WeBWorK &copy; 1996-2020 | host: $SITE_URL | course: $courseID | format: librete
 <script type="text/javascript">WWLocalStorage();</script>
 
 <script type="text/javascript">
-var response =$adapt_json_response_obj;
+var response =$adapt_call_return_answerJWT
 var returnobj = {
     subject: "webwork.result",
     message: response.message,
     type: response.type
 };
+
+window.alert("response message " + JSON.stringify(returnobj));
+
 window.parent.postMessage(JSON.stringify(returnobj), '*');
 
-//window.alert("response message " + JSON.stringify(returnobj));
+
 
 </script>
+
+
 </body>
 </html>
 

@@ -63,20 +63,19 @@ sub post_to_ADAPT {
 	my $ua = LWP::UserAgent->new( 'send_te' => '0' );
 	my $r  = HTTP::Request->new(
 		'POST' => 'https://dev.adapt.libretexts.org/api/jwt/process-answer-jwt',
-		[
-			'Accept' => 'application/json',
-			'Authorization' => "Bearer  $problemJWT_to_post",
-			'Host'       => 'dev.adapt.libretexts.org:443',
-			'User-Agent' => 'curl/7.55.1'
-		],
-#		qq{"{message" :  "this is the payload of the problemJWT",
-#		   "answerJWT": "$answerJWT_to_post"}
-#		}
+		['Content-Type' => 'application/json; charset=UTF-8'],
+# 		[
+# 			'Accept' => 'application/json',
+# 			'Authorization' => "Bearer  $problemJWT_to_post",
+# 			'Host'       => 'dev.adapt.libretexts.org:443',
+# 			'User-Agent' => 'curl/7.55.1'
+# 		],
+
 		$answerJWT_to_post
 	);
 	 my $adapt_call_hash = eval{
-								$ua->request( $r, )
-	  };
+						$ua->request( $r, )
+	 };
 	 if ($@) {
 		warn "problem with curl call $@";
 		return $@;

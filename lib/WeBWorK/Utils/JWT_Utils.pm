@@ -34,10 +34,10 @@ sub new {
 	my $ce = shift;  # grab a course environment variable
 	my $self = {
 		ce  => $ce,
-		path_to_config_file => '',
+		path_to_JWT_config_file => $ce->{path_to_JWT_config_file}//'',
  		secret_key => 'webwork', # the keyword for signing and the key word for encryption
-		content_alg =>''  , # the algorithm for encrypting the content_alg
-		signing_alg =>'HS256'   , # the algorithm for signing (encrypting the signature)
+		content_alg =>'', # 'A256CBCHS512'  , # the algorithm for encrypting the content_alg
+		signing_alg =>'HS256'   , # or A256KW  the algorithm for signing (encrypting the signature)
 		elapsed_time=>0,    # iat to exp
 		@options,
 	};
@@ -83,18 +83,18 @@ sub post_to_ADAPT {
 		warn "problem with curl call $@";
 		my $current_date = `date`;
 		return qq{ {"type":"failure","message": "unable to contact server-- $@", "last_submitted":"$current_date", "student_response":
-		"N\/A" }"};
+		"N\/A" }};
 	 }
-	 else { #FIXME make catching error more robust
+	 else { 
 	 	if ($adapt_call_hash->{_rc}==200){
 	 		return $adapt_call_hash->{_content}
 	 	}
-	 	else {
+	 	else { #catch errors reported by the server
 			my $error_code = $adapt_call_hash->{_rc};
 			my $error_msg  = $adapt_call_hash->{_msg};
 			my $current_date = `date`;
 			return qq{ {"type":"failure","message": "server error-- $error_code: $error_msg", "last_submitted":"$current_date" student_response":
-			"N\/A" }"};
+			"N\/A" }};
 	 	}
 	 }
 # other fields returned in this hash -- possibly useful for debugging

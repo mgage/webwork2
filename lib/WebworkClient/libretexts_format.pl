@@ -175,7 +175,7 @@ $previewButtonHTML  $submitButtonHTML  $showCorrectButtonHTML
 <script type="text/javascript">WWLocalStorage();</script>
 
 <script type="text/javascript">
-if ($adapt_call_return_answerJWT ) {//check first that a JWT was received
+if ($adapt_call_return_answerJWT !== false) {
 	var response =$adapt_call_return_answerJWT;
 	var returnobj = {subject: "webwork.result", message: response.message,type: response.type};
 	console.log("response message " + JSON.stringify(returnobj));

@@ -527,7 +527,7 @@ EOS
 my($answerTemplate_hash, $JSONanswerTemplate, $answerJWT_hash,
 	$sessionJWT_hash, $decode_problemJWT, 
 	$decode_answerJWT,
-	$adapt_call_return_problemJWT,$adapt_call_return_answerJWT, $pp_problemResult, 
+	$adapt_call_return_problemJWT,$adapt_call_return_answerJWT,  $pp_problemResult, 
 	$pp_problemState, $adapt_json_response_str
 );
 # these need to be declared outside the if block
@@ -560,22 +560,11 @@ if ($format_name eq 'libretexts') {
  		$pp_problemResult = pretty_print($problemResult);
  		$pp_problemState  = pretty_print($problemState);
  		my $adapt_json_response_obj=''; #{}   FIXME  the return is always a string it is a json string not a perl hash when things work. 
- 		my $adapt_response_message='';
  		if ($self->{inputs_ref}->{answersSubmitted} and not $previewMode) {
  			 		$adapt_json_response_obj = WeBWorK::Utils::JWT_Utils::post_to_ADAPT($problemJWT, $answerJWT); # ( json obj)
  			 		## FIXME -- want to be able to test the result first before acting on it. 
- 		}
-
-		#$adapt_response_hash_rh = decode_json($adapt_json_response_obj); #not used
-#		FIXME  the return is a json string not a perl hash when things work. 
-# 		if (ref($adapt_json_response_obj)=~/HASH/) {
-# 			$adapt_call_return_answerJWT = $adapt_json_response_obj;
-# 		}
-# 		else {
-# 			$adapt_call_return_answerJWT = $adapt_json_response_obj;
-# 		}
-		
-		$adapt_call_return_answerJWT = $adapt_json_response_obj;
+ 		}		
+		$adapt_call_return_answerJWT = $adapt_json_response_obj||q{'false'};  # prevent javascript syntax error
 	}
 }
  

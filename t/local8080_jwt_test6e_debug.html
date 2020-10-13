@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<title>iframe calling WeBWorK</title>
+	<meta name="generator" content="BBEdit 13.1" />
+</head>
+<body>
+<iframe allowtransparency="true" id="iFrameResizer0" src="http://localhost:8080/webwork2/html2xml?problemJWT=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczpcL1wvZGV2LmFkYXB0LmxpYnJldGV4dHMub3JnXC9hcGlcL2Fzc2lnbm1lbnRzXC8zXC9xdWVzdGlvbnNcL3ZpZXciLCJpYXQiOjE2MDE1NjYyOTYsImV4cCI6MTY4Nzk2NjI5NiwibmJmIjoxNjAxNTY2Mjk2LCJqdGkiOiJuUUhtS241U05HbWMyOFRuIiwic3ViIjoxMywicHJ2IjoiODdlMGFmMWVmOWZkMTU4MTJmZGVjOTcxNTNhMTRlMGIwNDc1NDZhYSIsImFkYXB0Ijp7ImFzc2lnbm1lbnRfaWQiOjMsInF1ZXN0aW9uX2lkIjo5MDk2LCJ0ZWNobm9sb2d5Ijoid2Vid29yayJ9LCJ3ZWJ3b3JrIjp7InByb2JsZW1TZWVkIjoiMTIzNDU2NyIsImNvdXJzZUlEIjoiZGFlbW9uX2NvdXJzZSIsInVzZXJJRCI6ImRhZW1vbiIsImNvdXJzZV9wYXNzd29yZCI6ImRhZW1vbiIsInNob3dTdW1tYXJ5IjoxLCJkaXNwbGF5TW9kZSI6Ik1hdGhKYXgiLCJsYW5ndWFnZSI6ImVuIiwib3V0cHV0Zm9ybWF0IjoibGlicmV0ZXh0cyIsInNob3dDb3JyZWN0QnV0dG9uIjowLCJzb3VyY2VGaWxlUGF0aCI6IkxpYnJhcnlcL1JvY2hlc3Rlclwvc2V0VmVjRnVuY3Rpb24yQ3VydmF0dXJlXC91cl92Y180XzMucGciLCJhbnN3ZXJzU3VibWl0dGVkIjoiMCIsImZvcm1fYWN0aW9uX3VybCI6Imh0dHBzOlwvXC9kZW1vLndlYndvcmsucm9jaGVzdGVyLmVkdVwvd2Vid29yazJcL2h0bWwyeG1sIiwicHJvYmxlbVVVSUQiOjk1Miwic2hvd0hpbnRzIjoxLCJzaG93U29sdXRpb24iOjEsInNob3dEZWJ1ZyI6MX19.LboUFreyjlSrgEB3qPMolrUB53EnRYxidd0eIqAgnpI" style="overflow: auto; height: 1274px;" width="100%" frameborder="0">
+</iframe>
+
+
+<!-- listener -->
+
+
+<script type="text/javascript">
+window.addEventListener('message', 
+	(event)=>{
+		if (event.type == 'message')  {
+			alert( "captured a message: " + JSON.stringify(event));
+			console.log("captured a message: " + JSON.stringify(event));
+			console.log("message reads: "  + JSON.stringify(event.data));
+			console.log("message origin: " + JSON.stringify(event.origin));
+			console.log("message source: " + JSON.stringify(event.source));
+		}
+	}, false
+
+);
+
+
+</script>
+
+
+
+<!-- 
+decoded JWT:
+{
+  "iss": "https://dev.adapt.libretexts.org/api/assignments/3/questions/view",
+  "iat": 1601566296,
+  "exp": 1687966296,
+  "nbf": 1601566296,
+  "jti": "nQHmKn5SNGmc28Tn",
+  "sub": 13,
+  "prv": "87e0af1ef9fd15812fdec97153a14e0b047546aa",
+  "adapt": {
+    "assignment_id": 3,
+    "question_id": 9096,
+    "technology": "webwork"
+  },
+  "webwork": {
+    "problemSeed": "1234567",
+    "courseID": "daemon_course",
+    "userID": "daemon",
+    "course_password": "daemon",
+    "showSummary": 1,
+    "displayMode": "MathJax",
+    "language": "en",
+    "outputformat": "libretexts",
+    "showCorrectButton": 0,
+    "sourceFilePath": "Library/Rochester/setVecFunction2Curvature/ur_vc_4_3.pg",
+    "answersSubmitted": "0",
+    "form_action_url": "https://demo.webwork.rochester.edu/webwork2/html2xml",
+    "problemUUID": 952,
+    "showHints": 1,
+    "showSolution": 1,
+    "showDebug": 1
+  }
+}
+
+
+-->
+</body>
+</html>

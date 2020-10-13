@@ -153,14 +153,13 @@ $previewButtonHTML  $submitButtonHTML  $showCorrectButtonHTML
 <!--  script for knowl-like object 
 -->
 
-<script>
+<script type="text/javascript">
 	$(document).ready(function(){
 		$(".clickme").click(function() {
 		  $( this).next().slideToggle( "slow", function() {
 			// Animation complete.
 		  });
 		});
-
 	   // jQuery methods go here...
 	});
 </script>
@@ -176,10 +175,12 @@ $previewButtonHTML  $submitButtonHTML  $showCorrectButtonHTML
 <script type="text/javascript">WWLocalStorage();</script>
 
 <script type="text/javascript">
-var response ="$adapt_call_return_answerJWT";
-var returnobj = {subject: "webwork.result", message: response.message,type: response.type};
-console.log("response message " + JSON.stringify(returnobj));
-window.parent.postMessage(JSON.stringify(returnobj), '*');
+if ($adapt_call_return_answerJWT ) {//check first that a JWT was received
+	var response =$adapt_call_return_answerJWT;
+	var returnobj = {subject: "webwork.result", message: response.message,type: response.type};
+	console.log("response message " + JSON.stringify(returnobj));
+	window.parent.postMessage(JSON.stringify(returnobj), '*');
+}
 </script>
 
 

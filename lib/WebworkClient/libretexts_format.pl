@@ -150,10 +150,12 @@ $previewButtonHTML  $submitButtonHTML  $showCorrectButtonHTML
 </div>
 </div>
 
-<!--  script for knowl-like object -->
+<!--  script for knowl-like object 
+-->
+
 <script>
 	$(document).ready(function(){
-		$( ".clickme" ).click(function() {
+		$(".clickme").click(function() {
 		  $( this).next().slideToggle( "slow", function() {
 			// Animation complete.
 		  });
@@ -162,31 +164,24 @@ $previewButtonHTML  $submitButtonHTML  $showCorrectButtonHTML
 	   // jQuery methods go here...
 	});
 </script>
+
 <div class="clickme" id="version">
-<img height="16px" width="16px" src="https://demo.webwork.rochester.edu/webwork2_files/images/webwork_square.svg"/>
+	<img height="16px" width="16px" src="https://demo.webwork.rochester.edu/webwork2_files/images/webwork_square.svg"/>
 </div>
 <div id="footer" style="display:none">
-WeBWorK &copy; 1996-2020 | host: $SITE_URL | course: $courseID | format: libretexts | theme: math4
+	WeBWorK &copy; 1996-2020 | host: $SITE_URL | course: $courseID | format: libretexts | theme: math4
 </div>
 
 <!-- Activate local storage js -->
 <script type="text/javascript">WWLocalStorage();</script>
 
 <script type="text/javascript">
-var response =$adapt_call_return_answerJWT
-var returnobj = {
-    subject: "webwork.result",
-    message: response.message,
-    type: response.type
-};
-
+var response ="$adapt_call_return_answerJWT";
+var returnobj = {subject: "webwork.result", message: response.message,type: response.type};
 console.log("response message " + JSON.stringify(returnobj));
-
 window.parent.postMessage(JSON.stringify(returnobj), '*');
-
-
-
 </script>
+
 
 
 </body>

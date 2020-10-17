@@ -8,7 +8,9 @@ use warnings;
 use JSON qw(encode_json decode_json);
 use LWP::UserAgent;
 use Crypt::JWT qw(decode_jwt encode_jwt);
+use WeBWorK::Utils qw(readFile);
 use Exporter;
+use Carp;
 
 use HTTP::Request;
 use lib "/opt/webwork/webwork2/lib";
@@ -28,23 +30,21 @@ our @EXPORT_OK = qw(
 sub new {
 	my $class = shift;
 	$class = (ref($class))? ref($class) : $class; # create a new object of the same class
-
-	my @options = @_;  #FIXME figure out how options should be passed in
-	$class = (ref($class))? ref($class) : $class; # create a new object of the same class
 	my $ce = shift;  # grab a course environment variable
+	my %options = @_;  #FIXME figure out how options should be passed in
 	my $self = {
 		ce  => $ce,
 		path_to_JWT_config_file => $ce->{path_to_JWT_config_file}//'',
- 		secret_key => 'webwork', # the keyword for signing and the key word for encryption
+ 		secret_key => '', # the keyword for signing and the key word for encryption
 		content_alg =>'', # 'A256CBCHS512'  , # the algorithm for encrypting the content_alg
 		signing_alg =>'HS256'   , # or A256KW  the algorithm for signing (encrypting the signature)
 		elapsed_time=>0,    # iat to exp
-		@options,
+		%options,
 	};
 	bless $self, $class;
 	# create accessors/mutators
     $self->mk_ro_accessors (qw( ce path_to_config_file secret_key content_alg signing_alg elapsed_time));
-	_init($self, @options);  #go grab data from the configuration file
+	_init($self, %options);  #go grab data from the configuration file
 	return $self;
 }
 
@@ -52,8 +52,27 @@ sub new {
 # perhaps it should be placed in a separate utils file
 sub _init {
 	my $self = shift;
-	$self->{path_to_config_file} = '';
-
+	my $string =readFile($self->{path_to_JWT_config_file});
+	#carp "path to file is ", $self->{path_to_JWT_config_file};
+	# make sure file exists
+	#carp "string is $string";
+	#carp "hash test is ", ref($string) =~/HASH/;
+	if ($string) {
+		# trim string
+		$string =~ s/^\s+|\s+$//; 
+		$self->{secret_key}=$string;
+		# procedure to use if file contains a JSON object
+		# including secret_key and algorithms
+		#my $rh_JWT_config =json2hash($string);
+		#$self->{secret_key}=$rh_JWT_config->{secret_key};
+		#$self->{content_alg}=$rh_JWT_config->{content_alg}//'';
+		#$self->{signing_alg}=$rh_JWT_config->{signing_alg}||'HS256';
+		#$self->{elapsed_time}=$rh_JWT_config->{elapsed_time}//0;
+		#warn "signing_alg is |".($self->signing_alg)."|";
+	}
+	else {  # #error code  this can be refined. 
+		croak("for some reason the JWT key has not been set");
+	}
 }
 sub post_to_ADAPT {
 	my $problemJWT_to_post = shift;

@@ -179,10 +179,10 @@ sub pre_header_initialize {
 	
 	# create a $ce from $r to configure the JWT
 	# new JWT_manager? JWT_util?   
-	my $jwt_tool = WeBWorK::Utils::JWT_Utils->new( {
-		ce => $r->{ce},
-	    # more initialization should follow.
-	});
+	my $jwt_tool = WeBWorK::Utils::JWT_Utils->new( 
+		$r->{ce}
+	);
+	# possibly more initializations should follow.
 	my $problemJWT  = $hash_from_web_form{problemJWT}//'';
 	if ($problemJWT) { #take all data from the problemJWT_payload
 		my $problemJWT_payload = $jwt_tool->jwt2hash($problemJWT); # TODO REMOVE INSECURE DEVELOPMENT KEY

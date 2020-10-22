@@ -542,8 +542,10 @@ $hardcopyThemeNames = {
 #    $externalPrograms{pdflatex} to use xelatex (here or in site.conf) !!!
 #$hardcopyTheme = "XeLaTeX-twoColumn";
 #$externalPrograms{pdflatex} ="/usr/bin/xelatex --shell-escape";
-
 ################################################################################
+# data for configuring JWT for embedding in libretexts
+#
+$path_to_JWT_config_file = "/opt/webwork/webwork2/conf/JWT_secret_key.txt";
 
 
 ################################################################################

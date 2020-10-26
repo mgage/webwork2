@@ -545,8 +545,7 @@ $hardcopyThemeNames = {
 ################################################################################
 # data for configuring JWT for embedding in libretexts
 #
-$path_to_JWT_config_file = "/opt/webwork/webwork2/conf/JWT_secret_key.txt";
-
+$path_to_JWT_config_file = "/opt/webwork/webwork2/JWE/webwork";
 
 ################################################################################
 # Webwork Caliper

@@ -101,8 +101,7 @@ sub post_to_ADAPT {
 	 if ($@) {
 		warn "problem with curl call $@";
 		my $current_date = `date`;
-		return qq{ {"type":"failure","message": "unable to contact server-- $@", "last_submitted":"$current_date", "student_response":
-		"N\/A" }};
+		return qq{ {"type":"failure","message": "unable to contact server-- $@", "last_submitted":"$current_date", "student_response":"N\/A" }};
 	 }
 	 else { 
 	 	if ($adapt_call_hash->{_rc}==200){
@@ -112,8 +111,7 @@ sub post_to_ADAPT {
 			my $error_code = $adapt_call_hash->{_rc};
 			my $error_msg  = $adapt_call_hash->{_msg};
 			my $current_date = `date`;
-			return qq{ {"type":"failure","message": "server error-- $error_code: $error_msg", "last_submitted":"$current_date" student_response":
-			"N\/A" }};
+			return qq{ {"type":"failure","message": "server error-- $error_code: $error_msg", "last_submitted":"$current_date", student_response":"N\/A" }};
 	 	}
 	 }
 # other fields returned in this hash -- possibly useful for debugging

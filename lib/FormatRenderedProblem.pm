@@ -534,7 +534,6 @@ my($answerTemplate_hash, $JSONanswerTemplate, $answerJWT_hash,
 if ($format_name eq 'libretexts') {
 	if ($problemJWT) {
 		$answerTemplate_hash= pretty_print($tbl->answerTemplate_hash ); #$tbl->answerTemplate_hash;
-		#$JSONanswerTemplate = $tbl -> JSONanswerTemplate;
 		$answerJWT_hash = {
 			score => $problemResult, #$JSONanswerTemplate,
 			problemJWT => $problemJWT,
@@ -544,6 +543,10 @@ if ($format_name eq 'libretexts') {
 		foreach my $key (qw(name exp iat nbf iss sub prv jti )) {
 			$answerJWT_hash->{$key} = $problemJWT_payload->{$key}//'';
 		}
+        # also grab the return address to ADAPT from the problemJWT (eric wants to be able to change this on the fly)  
+        my $address_prefix = $problemJWT_payload->{scheme_and_host} //'https://dev.adapt.libretexts.org' ;     
+        $adapt_post_address = "$problemJWT_payload->{scheme_and_host}/api/jwt/process-answer-jwt"; 
+        # either https://dev.adapt.libretexts.org (development)  or https://adapt.libretexts.org (live/production version)
 
 		##### sessionJWT
 		$sessionJWT_hash={};
@@ -561,7 +564,9 @@ if ($format_name eq 'libretexts') {
  		$pp_problemState  = pretty_print($problemState);
  		my $adapt_json_response_obj=''; #{}   FIXME  the return is always a string it is a json string not a perl hash when things work. 
  		if ($self->{inputs_ref}->{answersSubmitted} and not $previewMode) {
- 			 		$adapt_json_response_obj = WeBWorK::Utils::JWT_Utils::post_to_ADAPT($problemJWT, $answerJWT); # ( json obj)
+ 					
+ 			 		$adapt_json_response_obj = WeBWorK::Utils::JWT_Utils::post_to_ADAPT($adapt_post_address, $answerJWT); # ( json obj)
+ 			 		
  			 		## FIXME -- want to be able to test the result first before acting on it. 
  		}
  		else {

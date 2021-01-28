@@ -1,5 +1,6 @@
 ################################################################################
 # WeBWorK Online Homework Delivery System
+
 # Copyright &copy; 2000-2012 The openWeBWorK Project, http://github.com/openwebwork
 # $CVSHeader: webwork2/lib/WeBWorK/URLPath.pm,v 1.36 2008/04/29 19:27:34 sh002i Exp $
 # 
@@ -206,7 +207,7 @@ our %pathTypes = (
 	set_list => {
 		name    => '[_4]',
 		parent  => 'root',
-		kids    => [ qw/equation_display feedback gateway_quiz proctored_gateway_quiz answer_log grades hardcopy achievements
+		kids    => [ qw/equation_display feedback gateway_quiz proctored_gateway_quiz answer_log grades hardcopy achievements leaderboards
 			logout options instructor_tools problem_list
 		/ ],
 		match   => qr|^([^/]+)/|,
@@ -291,6 +292,17 @@ our %pathTypes = (
                 produce => 'achievements/',
                 display => 'WeBWorK::ContentGenerator::Achievements',
         },
+
+		leaderboards  => {
+	        name    => x('Leaderboards'),
+                parent  => 'set_list',
+                kids    => [ qw// ],
+                match   => qr|^leaderboards/|,
+                capture => [ qw// ],
+                produce => 'leaderboards/',
+                display => 'WeBWorK::ContentGenerator::Leaderboards',
+        },
+
 	hardcopy => {
 		name    => x('Hardcopy Generator'),
 		parent  => 'set_list',

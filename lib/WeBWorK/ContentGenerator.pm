@@ -823,8 +823,10 @@ sub links {
 			print CGI::li(&$makelink("${pfx}Grades", urlpath_args=>{%args}, systemlink_args=>\%systemlink_args));
 
 			if ($ce->{achievementsEnabled}) {
-			    print CGI::li(&$makelink("${pfx}Achievements", urlpath_args=>{%args}, systemlink_args=>\%systemlink_args));
-
+			    print CGI::li(&$makelink("${pfx}Achievements", urlpath_args=>{%args}, systemlink_args=>\%systemlink_args)); 
+			}
+			if ($ce->{achievementsEnabled} and $ce->{leaderboardEnabled}) {
+				print CGI::li(&$makelink("${pfx}Leaderboards", urlpath_args=>{%args}, systemlink_args=>\%systemlink_args)); 
 			}
 
 			if ($authz->hasPermissions($userID, "access_instructor_tools")) {

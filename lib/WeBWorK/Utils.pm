@@ -1748,7 +1748,7 @@ sub fetchEmailRecipients {
 # this subroutine could be expanded to
 
 sub generateURLs {
-	my ($self, $urlRequested) = @_;
+	my ($self, $urlRequested,$pathdata) = @_;
 	my $r = $self->r;
 	my $db = $r->db;
 	my $urlpath = $r->urlpath;
@@ -1756,9 +1756,22 @@ sub generateURLs {
 	my $setName = $urlpath->arg("setID");
 	my $problemNumber = $urlpath->arg("problemID");
 
+    #warn "urlpath", $urlpath, "ref ", ref($urlpath);
+    #warn "urlpath args " .join("|",( $urlpath->args));
+    #warn "r args ". join("|",(%$r));
+    #warn "r set ". join("|",($r->param("set")));
 	# generate context URLs
+    #warn("beginning to construct emailableURL");
 	my $emailableURL;
 	my $returnURL;
+	#warn " userName $userName, setName $setName, problemNumber $problemNumber";
+	if (defined $pathdata) {
+		$setName = $pathdata->{setName} unless $setName;
+		$problemNumber = $pathdata->{problemNumber} unless $problemNumber;
+		#warn "pathdata ". join("|",(%$pathdata));
+	}
+	#warn " userName $userName, setName $setName, problemNumber $problemNumber";
+	
 	if ($userName) {
 		my $modulePath;
 		my @args;
@@ -1788,14 +1801,18 @@ sub generateURLs {
 			params => [ "effectiveUser", @args ],
 			use_abs_url => 1,
 		);
+		
 		$returnURL = $self->systemLink($modulePath,
 			authen => 1,
 			params => [ @args ],
 		);
+		#warn "returnUrl is $returnURL";
+		#warn "args is @args";
 	} else {
 		$emailableURL = "(not available)";
 		$returnURL = "";
 	}
+#					warn "emailableURL is $emailableURL";
 	if ($urlRequested) {
 		if ($urlRequested eq 'relative') {
 			return $returnURL;

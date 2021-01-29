@@ -12,6 +12,11 @@ loadMacros(
 
 TEXT($BEGIN_ONE_COLUMN);
 
+loadMacros("PGML.pl");
+TEXT(beginproblem() );
+
+This non-standard order allows PGML to work in hardcopy. 
+
 ####################################################
 #
 # The item below printed out only when a hardcopy is made.

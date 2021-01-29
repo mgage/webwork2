@@ -7,12 +7,16 @@ DOCUMENT();
 loadMacros(
 	"PG.pl",
 	"PGbasicmacros.pl",
-	"PGML.pl",
+
 	#"source.pl", #uncommenting this will display "show source" button if that is permitted
 	"PGcourse.pl",
 );
 
 TEXT($BEGIN_ONE_COLUMN);
+loadMacros("PGML.pl");
+TEXT(beginproblem() );
+
+This non-standard order allows PGML to work in hardcopy. 
 
 ####################################################
 #

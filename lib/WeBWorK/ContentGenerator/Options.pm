@@ -200,9 +200,9 @@ sub body {
 	}
 
 
-	print CGI::h2($r->maketext("Change Display Name"));
+	print CGI::h2($r->maketext("Change Leaderboard Display Name"));
 	
-		# changing display name
+		# changing leaderboard display name
 	if ($changeOptions and $newName) {
 		if ($authz->hasPermissions($userID, "change_email_address")) {
 			
@@ -212,17 +212,17 @@ sub body {
 			if ($@) {
 				$EUser->comment($oldName);
 				print CGI::div({class=>"ResultsWithError",tabindex=>'-1'},
-					CGI::p($r->maketext("Couldn't change your display name: [_1]",$@)),
+					CGI::p($r->maketext("Couldn't change your leaderboard display name: [_1]",$@)),
 				);
 			} else {
 				print CGI::div({class=>"ResultsWithoutError"},
-					CGI::p($r->maketext("Your display name has been changed.")),
+					CGI::p($r->maketext("Your leaderboard display name has been changed.")),
 				);
 			}
 			
 		} else {
 			print CGI::div({class=>"ResultsWithError",tabindex=>'-1'},
-				CGI::p($r->maketext("You do not have permission to change your display name.")),
+				CGI::p($r->maketext("You do not have permission to change your leaderboard display name.")),
 			);
 		}
 	}
@@ -241,12 +241,12 @@ sub body {
 			),
 		);
 	} else {
-		print CGI::p($r->maketext("You do not have permission to change display name."))
+		print CGI::p($r->maketext("You do not have permission to change leaderboard display name."))
 			unless $changeOptions and $newName; # avoid double message
 	}
 
 	
-	print CGI::h2($r->maketext("Change Display Settings"));
+	print CGI::h2($r->maketext("Change equation Display Settings"));
 
 	if ($changeOptions) {
 	    
